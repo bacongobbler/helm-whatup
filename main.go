@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
-	"sync"
 
 	"github.com/spf13/cobra"
 
@@ -32,68 +30,70 @@ func main() {
 }
 
 func run(cmd *cobra.Command, args []string) error {
-	var (
-		indices  []*repo.IndexFile
-		releases []*release.Release
-		wg       sync.WaitGroup
-	)
 	client := helm.NewClient(helm.Host(os.Getenv("TILLER_HOST")))
 
-	wg.Add(2)
+	releases, err := fetchReleases(client)
+	if err != nil {
+		return err
+	}
 
-	go fetchReleases(client, releases, wg)
-	go fetchIndices(client, indices, wg)
-
-	wg.Wait()
+	repositories, err := fetchIndices(client)
+	if err != nil {
+		return err
+	}
 
 	if len(releases) == 0 {
-		log.Info("No releases found. All up to date!")
+		fmt.Println("No releases found. All up to date!")
 		return nil
 	}
 
 	if len(repositories) == 0 {
-		log.Info("No repositories found. Did you run `helm repo update`?")
+		fmt.Println("No repositories found. Did you run `helm repo update`?")
 		return nil
 	}
 
 	for _, release := range releases {
-		for _, idx := range indices {
-			if idx.Has(release.Name, release.Version) {
+		for _, idx := range repositories {
+			if idx.Has(release.Chart.Metadata.Name, release.Chart.Metadata.Version) {
 				// fetch latest release
-				chartVer, err := idx.Get(release.Name, "")
+				chartVer, err := idx.Get(release.Chart.Metadata.Name, "")
 				if err != nil {
-					log.Fatal(err)
+					return err
 				}
-				if chartVer.Version != release.Version {
-					// if it differs, then there's an updata available.
-					log.Info(fmt.Sprintf("there is an update available for %s.\nInstalled version: %s\nAvailable version: %s", release.Name, release.Version, chartVer.Version))
+				if chartVer.Version != release.Chart.Metadata.Version {
+					// if it differs, then there's an update available.
+					fmt.Printf("There is an update available for release %s (%s)!\nInstalled version: %s\nAvailable version: %s\n", release.Name, release.Chart.Metadata.Name, release.Chart.Metadata.Version, chartVer.Version)
+				} else {
+					fmt.Printf("Release %s (%s) is up to date (%s).\n", release.Name, release.Chart.Metadata.Name, release.Chart.Metadata.Version)
 				}
 			}
 		}
 	}
+	fmt.Println("Done.")
+	return nil
 }
 
-func fetchReleases(client *helm.Client, releases []*release.Release, wg *sync.WaitGroup) {
-	defer wg.Done()
-	res, err := client.ListReleases(helm.ReleaseListStatuses([]release.Status_Code{release.Status_DEPLOYED}))
+func fetchReleases(client *helm.Client) ([]*release.Release, error) {
+	res, err := client.ListReleases()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	releases = res.Releases
+	return res.Releases, nil
 }
 
-func fetchIndices(client *helm.Client, indices []*repo.IndexFile, wg *sync.WaitGroup) {
-	defer wg.Done()
+func fetchIndices(client *helm.Client) ([]*repo.IndexFile, error) {
+	indices := []*repo.IndexFile{}
 	rfp := os.Getenv("HELM_PATH_REPOSITORY_FILE")
 	repofile, err := repo.LoadRepositoriesFile(rfp)
 	if err != nil {
-		log.Fatalf("could not load repositories file '%s': %s", rfp, err)
+		return nil, fmt.Errorf("could not load repositories file '%s': %s", rfp, err)
 	}
-	for _, repository := range repofile {
+	for _, repository := range repofile.Repositories {
 		idx, err := repo.LoadIndexFile(repository.Cache)
 		if err != nil {
-			log.Fatalf("could not load index file '%s': %s", repository.Cache, err)
+			return nil, fmt.Errorf("could not load index file '%s': %s", repository.Cache, err)
 		}
-		indices := append(indices, idx)
+		indices = append(indices, idx)
 	}
+	return indices, nil
 }

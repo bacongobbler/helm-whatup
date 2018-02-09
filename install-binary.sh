@@ -92,7 +92,7 @@ fail_trap() {
   result=$?
   if [ "$result" != "0" ]; then
     echo "Failed to install $PROJECT_NAME"
-    echo "\tFor support, go to https://github.com/kubernetes/helm."
+    echo "\tFor support, go to https://github.com/bacongobbler/helm-whatup."
   fi
   exit $result
 }
