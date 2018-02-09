@@ -5,7 +5,7 @@
 PROJECT_NAME="helm-whatup"
 PROJECT_GH="bacongobbler/$PROJECT_NAME"
 
-: ${HELM_PLUGIN_PATH:="$(helm home)/plugins/helm-whatup"}
+: ${HELM_PLUGIN_PATH:="$HELM_HOME/plugins/helm-whatup"}
 
 if [[ $SKIP_BIN_INSTALL == "1" ]]; then
   echo "Skipping binary install"
@@ -34,14 +34,13 @@ initOS() {
   case "$OS" in
     # Minimalist GNU for Windows
     mingw*) OS='windows';;
-    darwin) OS='macos';;
   esac
 }
 
 # verifySupported checks that the os/arch combination is supported for
 # binary builds.
 verifySupported() {
-  local supported="linux-amd64\nmacos-amd64"
+  local supported="linux-amd64\ndarwin-amd64"
   if ! echo "${supported}" | grep -q "${OS}-${ARCH}"; then
     echo "No prebuild binary for ${OS}-${ARCH}."
     exit 1
@@ -76,15 +75,13 @@ downloadFile() {
   fi
 }
 
-# installFile verifies the SHA256 for the file, then unpacks and
-# installs it.
+# installFile unpacks and installs helm-whatup.
 installFile() {
   HELM_TMP="/tmp/$PROJECT_NAME"
   mkdir -p "$HELM_TMP"
   tar xf "$PLUGIN_TMP_FILE" -C "$HELM_TMP"
-  HELM_TMP_BIN="$HELM_TMP/tpl"
   echo "Preparing to install into ${HELM_PLUGIN_PATH}"
-  cp "$HELM_TMP_BIN" "$HELM_PLUGIN_PATH"
+  cp -R "$HELM_TMP/bin" "$HELM_PLUGIN_PATH/"
 }
 
 # fail_trap is executed if an error occurs.
@@ -101,7 +98,7 @@ fail_trap() {
 testVersion() {
   set +e
   echo "$PROJECT_NAME installed into $HELM_PLUGIN_PATH/$PROJECT_NAME"
-  $HELM_PLUGIN_PATH/tpl -h
+  $HELM_PLUGIN_PATH/bin/helm-whatup -h
   set -e
 }
 

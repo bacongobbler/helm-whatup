@@ -13,9 +13,9 @@ build:
 dist:
 	mkdir -p $(DIST)
 	GOOS=linux GOARCH=amd64 go build -o bin/helm-whatup ./main.go
-	tar -zcvf $(DIST)/helm-whatup-linux-$(VERSION).tgz tpl README.md LICENSE plugin.yaml
+	tar -zcvf $(DIST)/helm-whatup-$(VERSION)-linux-amd64.tar.gz bin/helm-whatup README.md LICENSE plugin.yaml
 	GOOS=darwin GOARCH=amd64 go build -o bin/helm-whatup ./main.go
-	tar -zcvf $(DIST)/helm-whatup-macos-$(VERSION).tgz tpl README.md LICENSE plugin.yaml
+	tar -zcvf $(DIST)/helm-whatup-$(VERSION)-darwin-amd64.tar.gz bin/helm-whatup README.md LICENSE plugin.yaml
 
 
 .PHONY: bootstrap

@@ -3,4 +3,6 @@ version: "0.1.0"
 usage: "checks if installed charts are out of date"
 description: "Checks if installed charts are out of date against the Helm repositories."
 command: "$HELM_PLUGIN_DIR/bin/helm-whatup"
+hooks:
+  install: "$HELM_PLUGIN_DIR/install-binary.sh"
 useTunnel: true
