@@ -5,6 +5,7 @@ This is a Helm plugin to help users determine if there's an update available for
 ## Usage
 
 ```
+$ helm repo update
 $ helm whatup
 ```
 
