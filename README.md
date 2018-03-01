@@ -1,6 +1,6 @@
 # Helm Whatup
 
-This is a Helm plugin to help users determine if there's an update available for their installed charts.
+This is a Helm plugin to help users determine if there's an update available for their installed charts. It works by reading your locally cached index files from the chart repositories (via `helm repo update`) and checking the version against the latest deployed version of your charts in the Kubernetes cluster.
 
 ## Usage
 
