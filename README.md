@@ -40,7 +40,7 @@ Then run the following to get running.
 ```
 $ cd helm-whatup
 $ make bootstrap build
-$ SKIP_BIN_INSTALL=1 helm plugin install $GOPATH/src/github.com/technosophos/helm-template
+$ SKIP_BIN_INSTALL=1 helm plugin install $GOPATH/src/github.com/bacongobbler/helm-whatup
 ```
 
 That last command will skip fetching the binary install and use the one you
