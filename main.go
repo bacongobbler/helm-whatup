@@ -20,11 +20,17 @@ var outputFormat string
 
 var version = "canary"
 
+const (
+	statusOutdated = "OUTDATED"
+	statusUptodate = "UPTODATE"
+)
+
 type ChartVersionInfo struct {
 	ReleaseName      string `json:"releaseName"`
 	ChartName        string `json:"chartName"`
 	InstalledVersion string `json:"installedVersion"`
 	LatestVersion    string `json:"latestVersion"`
+	Status           string `json:"status"`
 }
 
 func main() {
@@ -82,6 +88,11 @@ func run(cmd *cobra.Command, args []string) error {
 					LatestVersion:    chartVer.Version,
 				}
 
+				if versionStatus.InstalledVersion == versionStatus.LatestVersion {
+					versionStatus.Status = statusUptodate
+				} else {
+					versionStatus.Status = statusOutdated
+				}
 				result = append(result, versionStatus)
 			}
 		}
@@ -93,7 +104,7 @@ func run(cmd *cobra.Command, args []string) error {
 			if versionInfo.LatestVersion != versionInfo.InstalledVersion {
 				fmt.Printf("There is an update available for release %s (%s)!\nInstalled version: %s\nAvailable version: %s\n", versionInfo.ReleaseName, versionInfo.ChartName, versionInfo.InstalledVersion, versionInfo.LatestVersion)
 			} else {
-				fmt.Printf("Release %s (%s) is up to date (%s).\n", versionInfo.ReleaseName, versionInfo.LatestVersion)
+				fmt.Printf("Release %s (%s) is up to date.\n", versionInfo.ReleaseName, versionInfo.LatestVersion)
 			}
 		}
 		fmt.Println("Done.")
