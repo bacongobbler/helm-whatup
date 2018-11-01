@@ -103,6 +103,8 @@ func run(cmd *cobra.Command, args []string) error {
 			return err
 		}
 		fmt.Println(string(outputBytes))
+	default:
+		return fmt.Errorf("invalid formatter: %s", outputFormat)
 	}
 
 	return nil
