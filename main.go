@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -15,7 +16,16 @@ const globalUsage = `
 Check to see if there is an updated version available for installed charts.
 `
 
+var outputFormat string
+
 var version = "canary"
+
+type ChartVersionInfo struct {
+	ReleaseName      string `json:"releaseName"`
+	ChartName        string `json:"chartName"`
+	InstalledVersion string `json:"installedVersion"`
+	LatestVersion    string `json:"latestVersion"`
+}
 
 func main() {
 	cmd := &cobra.Command{
@@ -23,6 +33,8 @@ func main() {
 		Short: fmt.Sprintf("check if installed charts are out of date (helm-whatup %s)", version),
 		RunE:  run,
 	}
+
+	cmd.Flags().StringVarP(&outputFormat, "output", "o", "plain", "Output format")
 
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
@@ -52,6 +64,8 @@ func run(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
+	var result []ChartVersionInfo
+
 	for _, release := range releases {
 		for _, idx := range repositories {
 			if idx.Has(release.Chart.Metadata.Name, release.Chart.Metadata.Version) {
@@ -60,16 +74,37 @@ func run(cmd *cobra.Command, args []string) error {
 				if err != nil {
 					return err
 				}
-				if chartVer.Version != release.Chart.Metadata.Version {
-					// if it differs, then there's an update available.
-					fmt.Printf("There is an update available for release %s (%s)!\nInstalled version: %s\nAvailable version: %s\n", release.Name, release.Chart.Metadata.Name, release.Chart.Metadata.Version, chartVer.Version)
-				} else {
-					fmt.Printf("Release %s (%s) is up to date (%s).\n", release.Name, release.Chart.Metadata.Name, release.Chart.Metadata.Version)
+
+				versionStatus := ChartVersionInfo{
+					ReleaseName:      release.Name,
+					ChartName:        release.Chart.Metadata.Name,
+					InstalledVersion: release.Chart.Metadata.Version,
+					LatestVersion:    chartVer.Version,
 				}
+
+				result = append(result, versionStatus)
 			}
 		}
 	}
-	fmt.Println("Done.")
+
+	switch outputFormat {
+	case "plain":
+		for _, versionInfo := range result {
+			if versionInfo.LatestVersion != versionInfo.InstalledVersion {
+				fmt.Printf("There is an update available for release %s (%s)!\nInstalled version: %s\nAvailable version: %s\n", versionInfo.ReleaseName, versionInfo.ChartName, versionInfo.InstalledVersion, versionInfo.LatestVersion)
+			} else {
+				fmt.Printf("Release %s (%s) is up to date (%s).\n", versionInfo.ReleaseName, versionInfo.LatestVersion)
+			}
+		}
+		fmt.Println("Done.")
+	case "json":
+		outputBytes, err := json.MarshalIndent(result, "", "    ")
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(outputBytes))
+	}
+
 	return nil
 }
 
