@@ -17,6 +17,14 @@ $ helm plugin install https://github.com/bacongobbler/helm-whatup
 
 The above will fetch the latest binary release of `helm whatup` and install it.
 
+## Configuration
+If running as a helm plugin the following values are set correctly by default.
+* HELM_PATH_REPOSITORY_FILE (default 127.0.0.1:44134)
+* TILLER_HOST (default $HOME/.helm/repository/repositories.yaml)
+
+If running the binary directly these values must be set to the correct values for your system.
+
+
 ### Developer (From Source) Install
 
 If you would like to handle the build yourself, instead of fetching a binary,
@@ -25,8 +33,6 @@ this is how recommend doing it.
 First, set up your environment:
 
 - You need to have [Go](http://golang.org) installed. Make sure to set `$GOPATH`
-- If you don't have [Glide](http://glide.sh) installed, this will install it into
-  `$GOPATH/bin` for you.
 
 Clone this repo into your `$GOPATH` using git.
 

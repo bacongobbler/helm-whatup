@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/user"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 
@@ -48,7 +50,11 @@ func main() {
 }
 
 func run(cmd *cobra.Command, args []string) error {
-	client := helm.NewClient(helm.Host(os.Getenv("TILLER_HOST")))
+	host, exists := os.LookupEnv("TILLER_HOST")
+	if !exists {
+		host = "127.0.0.1:44134"
+	}
+	client := helm.NewClient(helm.Host(host))
 
 	releases, err := fetchReleases(client)
 	if err != nil {
@@ -78,7 +84,11 @@ func run(cmd *cobra.Command, args []string) error {
 				// fetch latest release
 				chartVer, err := idx.Get(release.Chart.Metadata.Name, "")
 				if err != nil {
-					return err
+					chartVer, err = idx.Get(release.Chart.Metadata.Name, ">0.0.0-0")
+					if err != nil {
+						fmt.Println(err)
+						continue
+					}
 				}
 
 				versionStatus := ChartVersionInfo{
@@ -131,7 +141,13 @@ func fetchReleases(client *helm.Client) ([]*release.Release, error) {
 
 func fetchIndices(client *helm.Client) ([]*repo.IndexFile, error) {
 	indices := []*repo.IndexFile{}
-	rfp := os.Getenv("HELM_PATH_REPOSITORY_FILE")
+	rfp, exists := os.LookupEnv("HELM_PATH_REPOSITORY_FILE")
+	if !exists {
+		usr, err := user.Current()
+		if err == nil {
+			rfp = filepath.FromSlash(usr.HomeDir + "/.helm/repository/repositories.yaml")
+		}
+	}
 	repofile, err := repo.LoadRepositoriesFile(rfp)
 	if err != nil {
 		return nil, fmt.Errorf("could not load repositories file '%s': %s", rfp, err)
