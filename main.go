@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 
 	"k8s.io/helm/pkg/helm"
 	"k8s.io/helm/pkg/proto/hapi/release"
@@ -17,6 +19,7 @@ Check to see if there is an updated version available for installed charts.
 `
 
 var outputFormat string
+var statusFilter string
 
 var version = "canary"
 
@@ -40,7 +43,8 @@ func main() {
 		RunE:  run,
 	}
 
-	cmd.Flags().StringVarP(&outputFormat, "output", "o", "plain", "Output format")
+	cmd.Flags().StringVarP(&outputFormat, "output", "o", "plain", "Output format (plain, json, yaml)")
+	cmd.Flags().StringVarP(&statusFilter, "status", "s", "OUTDATED,UPTODATE", "Filter for the status of the chart (OUTDATED, UPTODATE)")
 
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
@@ -93,7 +97,10 @@ func run(cmd *cobra.Command, args []string) error {
 				} else {
 					versionStatus.Status = statusOutdated
 				}
-				result = append(result, versionStatus)
+
+				if strings.Contains(statusFilter, versionStatus.Status) {
+					result = append(result, versionStatus)
+				}
 			}
 		}
 	}
@@ -110,6 +117,12 @@ func run(cmd *cobra.Command, args []string) error {
 		fmt.Println("Done.")
 	case "json":
 		outputBytes, err := json.MarshalIndent(result, "", "    ")
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(outputBytes))
+	case "yaml":
+		outputBytes, err := yaml.Marshal(result)
 		if err != nil {
 			return err
 		}
