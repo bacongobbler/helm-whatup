@@ -17,6 +17,18 @@ $ helm plugin install https://github.com/bacongobbler/helm-whatup
 
 The above will fetch the latest binary release of `helm whatup` and install it.
 
+## Flags
+
+```
+Usage:
+  whatup [flags]
+
+Flags:
+  -h, --help            help for whatup
+  -o, --output string   Output format (plain, json, yaml) (default "plain")
+  -s, --status string   Filter for the status of the chart (OUTDATED, UPTODATE) (default "OUTDATED,UPTODATE")
+```
+
 ### Developer (From Source) Install
 
 If you would like to handle the build yourself, instead of fetching a binary,
