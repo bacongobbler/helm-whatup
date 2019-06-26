@@ -61,12 +61,16 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(releases) == 0 {
-		fmt.Println("No releases found. All up to date!")
+		if outputFormat == "plain" {
+			fmt.Println("No releases found. All up to date!")
+		}
 		return nil
 	}
 
 	if len(repositories) == 0 {
-		fmt.Println("No repositories found. Did you run `helm repo update`?")
+		if outputFormat == "plain" {
+			fmt.Println("No repositories found. Did you run `helm repo update`?")
+		}
 		return nil
 	}
 
@@ -125,6 +129,9 @@ func fetchReleases(client *helm.Client) ([]*release.Release, error) {
 	res, err := client.ListReleases()
 	if err != nil {
 		return nil, err
+	}
+	if res == nil {
+		return []*release.Release{}, nil
 	}
 	return res.Releases, nil
 }
