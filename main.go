@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 
 	"k8s.io/helm/pkg/helm"
 	"k8s.io/helm/pkg/proto/hapi/release"
@@ -114,6 +115,14 @@ func run(cmd *cobra.Command, args []string) error {
 		fmt.Println("Done.")
 	case "json":
 		outputBytes, err := json.MarshalIndent(result, "", "    ")
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(outputBytes))
+	case "yml":
+		fallthrough
+	case "yaml":
+		outputBytes, err := yaml.Marshal(result)
 		if err != nil {
 			return err
 		}
