@@ -41,7 +41,7 @@ func main() {
 		RunE:  run,
 	}
 
-	cmd.Flags().StringVarP(&outputFormat, "output", "o", "plain", "Output format")
+	cmd.Flags().StringVarP(&outputFormat, "output", "o", "plain", "Output format, choose from plain, json, yaml")
 
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
