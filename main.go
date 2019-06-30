@@ -126,6 +126,9 @@ func fetchReleases(client *helm.Client) ([]*release.Release, error) {
 	if err != nil {
 		return nil, err
 	}
+	if res == nil {
+		return []*release.Release{}, nil
+	}
 	return res.Releases, nil
 }
 
