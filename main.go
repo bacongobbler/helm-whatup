@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 
 	"k8s.io/helm/pkg/helm"
 	"k8s.io/helm/pkg/proto/hapi/release"
@@ -40,7 +41,7 @@ func main() {
 		RunE:  run,
 	}
 
-	cmd.Flags().StringVarP(&outputFormat, "output", "o", "plain", "Output format")
+	cmd.Flags().StringVarP(&outputFormat, "output", "o", "plain", "Output format, choose from plain, json, yaml")
 
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
@@ -61,14 +62,14 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(releases) == 0 {
-		if outputFormat == 'plain' {
- 			fmt.Println("No releases found. All up to date!")
+		if outputFormat == "plain" {
+			fmt.Println("No releases found. All up to date!")
 		}
 		return nil
 	}
 
 	if len(repositories) == 0 {
-		if outputFormat == 'plain' {
+		if outputFormat == "plain" {
 			fmt.Println("No repositories found. Did you run `helm repo update`?")
 		}
 		return nil
@@ -114,6 +115,14 @@ func run(cmd *cobra.Command, args []string) error {
 		fmt.Println("Done.")
 	case "json":
 		outputBytes, err := json.MarshalIndent(result, "", "    ")
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(outputBytes))
+	case "yml":
+		fallthrough
+	case "yaml":
+		outputBytes, err := yaml.Marshal(result)
 		if err != nil {
 			return err
 		}
