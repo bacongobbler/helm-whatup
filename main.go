@@ -18,6 +18,7 @@ Check to see if there is an updated version available for installed charts.
 `
 
 var outputFormat string
+var devel bool
 
 var version = "canary"
 
@@ -42,6 +43,7 @@ func main() {
 	}
 
 	cmd.Flags().StringVarP(&outputFormat, "output", "o", "plain", "Output format, choose from plain, json, yaml")
+	cmd.Flags().BoolVarP(&devel, "devel", "d", false, "Wether to include pre-releases or not, defaults to false.")
 
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
@@ -52,6 +54,7 @@ func run(cmd *cobra.Command, args []string) error {
 	client := helm.NewClient(helm.Host(os.Getenv("TILLER_HOST")))
 
 	releases, err := fetchReleases(client)
+	fmt.Printf("Test: %+v", len(releases))
 	if err != nil {
 		return err
 	}
@@ -81,7 +84,12 @@ func run(cmd *cobra.Command, args []string) error {
 		for _, idx := range repositories {
 			if idx.Has(release.Chart.Metadata.Name, release.Chart.Metadata.Version) {
 				// fetch latest release
-				chartVer, err := idx.Get(release.Chart.Metadata.Name, "")
+				constraint := ""
+				// Include pre-releases
+				if devel {
+					constraint = ">= *-0"
+				}
+				chartVer, err := idx.Get(release.Chart.Metadata.Name, constraint)
 				if err != nil {
 					return err
 				}
