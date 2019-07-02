@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
+	"github.com/Masterminds/semver"
 	"k8s.io/helm/pkg/helm"
 	"k8s.io/helm/pkg/proto/hapi/release"
 	"k8s.io/helm/pkg/repo"
@@ -54,7 +55,6 @@ func run(cmd *cobra.Command, args []string) error {
 	client := helm.NewClient(helm.Host(os.Getenv("TILLER_HOST")))
 
 	releases, err := fetchReleases(client)
-	fmt.Printf("Test: %+v", len(releases))
 	if err != nil {
 		return err
 	}
