@@ -43,7 +43,7 @@ func main() {
 	}
 
 	cmd.Flags().StringVarP(&outputFormat, "output", "o", "plain", "Output format, choose from plain, json, yaml")
-	cmd.Flags().BoolVarP(&devel, "devel", "d", false, "Wether to include pre-releases or not, defaults to false.")
+	cmd.Flags().BoolVarP(&devel, "devel", "d", false, "Whether to include pre-releases or not, defaults to false.")
 
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
