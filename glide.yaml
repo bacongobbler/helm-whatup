@@ -26,3 +26,5 @@ import:
   - pkg/tlsutil
 - package: github.com/jedib0t/go-pretty
   version: 4.2.1
+  subpackages:
+  - table
