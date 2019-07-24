@@ -13,14 +13,11 @@ build:
 dist:
 	mkdir -p $(DIST)
 	GOOS=linux GOARCH=amd64 go build -o bin/helm-whatup ./main.go
-	tar -zcvf $(DIST)/helm-whatup-$(VERSION)-linux-amd64.tar.gz bin/helm-whatup README.md LICENSE plugin.yaml
+	tar -zcvf $(DIST)/helm-whatup-$(VERSION)-linux-amd64.tar.gz bin/helm-whatup README.md LICENSE.md plugin.yaml
 	GOOS=darwin GOARCH=amd64 go build -o bin/helm-whatup ./main.go
-	tar -zcvf $(DIST)/helm-whatup-$(VERSION)-darwin-amd64.tar.gz bin/helm-whatup README.md LICENSE plugin.yaml
+	tar -zcvf $(DIST)/helm-whatup-$(VERSION)-darwin-amd64.tar.gz bin/helm-whatup README.md LICENSE.md plugin.yaml
 
 
 .PHONY: bootstrap
 bootstrap:
-ifndef HAS_DEP
-	go get -u github.com/golang/dep/cmd/dep
-endif
-	dep ensure -v
+	glide install

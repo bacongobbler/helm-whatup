@@ -1,0 +1,164 @@
+hash: c4a17c72d44a44ddec698454e0505a11ad2163d9fb213771abc6a39874210593
+updated: 2019-07-24T22:21:24.904432551+02:00
+imports:
+- name: github.com/BurntSushi/toml
+  version: 3012a1dbe2e4bd1391d42b32f0577cb7bbc7f005
+- name: github.com/cyphar/filepath-securejoin
+  version: a261ee33d7a517f054effbf451841abaafe3e0fd
+- name: github.com/ghodss/yaml
+  version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
+- name: github.com/gobwas/glob
+  version: 5ccd90ef52e1e632236f7326478d4faa74f99438
+  subpackages:
+  - compiler
+  - match
+  - syntax
+  - syntax/ast
+  - syntax/lexer
+  - util/runes
+  - util/strings
+- name: github.com/golang/protobuf
+  version: aa810b61a9c79d51363740d207bb46cf8e620ed5
+  subpackages:
+  - proto
+  - ptypes
+  - ptypes/any
+  - ptypes/duration
+  - ptypes/timestamp
+- name: github.com/google/uuid
+  version: 064e2069ce9c359c118179501254f67d7d37ba24
+- name: github.com/huandu/xstrings
+  version: f02667b379e2fb5916c3cda2cf31e0eb885d79f8
+- name: github.com/imdario/mergo
+  version: 9316a62528ac99aaecb4e47eadd6dc8aa6533d58
+- name: github.com/inconshreveable/mousetrap
+  version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/jedib0t/go-pretty
+  version: b5d36c1d5faf07737526e2a983b46b3252546897
+- name: github.com/Masterminds/goutils
+  version: 41ac8693c5c10a92ea1ff5ac3a7f95646f6123b0
+- name: github.com/Masterminds/semver
+  version: c7af12943936e8c39859482e61f0574c2fd7fc75
+- name: github.com/Masterminds/sprig
+  version: 258b00ffa7318e8b109a141349980ffbd30a35db
+- name: github.com/pkg/errors
+  version: 645ef00459ed84a119197bfb8d8205042c6df63d
+- name: github.com/spf13/cobra
+  version: f2b07da1e2c38d5f12845a4f607e2e1018cbb1f5
+- name: github.com/spf13/pflag
+  version: 24fa6976df40757dce6aea913e7b81ade90530e1
+- name: golang.org/x/crypto
+  version: de0752318171da717af4ce24d0a2e8626afaeb11
+  subpackages:
+  - cast5
+  - openpgp
+  - openpgp/armor
+  - openpgp/clearsign
+  - openpgp/elgamal
+  - openpgp/errors
+  - openpgp/packet
+  - openpgp/s2k
+  - pbkdf2
+  - scrypt
+  - ssh/terminal
+- name: golang.org/x/net
+  version: 65e2d4e15006aab9813ff8769e768bbf4bb667a0
+  subpackages:
+  - context
+  - http/httpguts
+  - http2
+  - http2/hpack
+  - idna
+  - internal/timeseries
+  - trace
+- name: golang.org/x/sys
+  version: b90733256f2e882e81d52f9126de08df5615afd9
+  subpackages:
+  - unix
+- name: golang.org/x/text
+  version: b19bf474d317b857955b12035d2c5acb57ce8b01
+  subpackages:
+  - secure/bidirule
+  - transform
+  - unicode/bidi
+  - unicode/norm
+- name: google.golang.org/genproto
+  version: 09f6ed296fc66555a25fe4ce95173148778dfa85
+  subpackages:
+  - googleapis/rpc/status
+- name: google.golang.org/grpc
+  version: a02b0774206b209466313a0b525d2c738fe407eb
+  subpackages:
+  - balancer
+  - balancer/base
+  - balancer/roundrobin
+  - binarylog/grpc_binarylog_v1
+  - codes
+  - connectivity
+  - credentials
+  - credentials/internal
+  - encoding
+  - encoding/proto
+  - grpclog
+  - health/grpc_health_v1
+  - internal
+  - internal/backoff
+  - internal/binarylog
+  - internal/channelz
+  - internal/envconfig
+  - internal/grpcrand
+  - internal/grpcsync
+  - internal/syscall
+  - internal/transport
+  - keepalive
+  - metadata
+  - naming
+  - peer
+  - resolver
+  - resolver/dns
+  - resolver/passthrough
+  - stats
+  - status
+  - tap
+- name: gopkg.in/yaml.v2
+  version: 51d6538a90f86fe93ac480b35f37b2be17fef232
+- name: k8s.io/apimachinery
+  version: 6a84e37a896db9780c75367af8d2ed2bb944022e
+  subpackages:
+  - pkg/version
+- name: k8s.io/client-go
+  version: 1a26190bd76a9017e289958b9fba936430aa3704
+  subpackages:
+  - kubernetes
+  - rest
+  - util/homedir
+- name: k8s.io/cloud-provider
+  version: 1bc0c81fa51dbc42d811a06f0622c1751c7085ae
+- name: k8s.io/helm
+  version: 5270352a09c7e8b6e8c9593002a73535276507c0
+  subpackages:
+  - pkg/chartutil
+  - pkg/engine
+  - pkg/getter
+  - pkg/helm
+  - pkg/helm/environment
+  - pkg/helm/helmpath
+  - pkg/helm/portforwarder
+  - pkg/ignore
+  - pkg/kube
+  - pkg/manifest
+  - pkg/plugin
+  - pkg/proto/hapi/chart
+  - pkg/proto/hapi/release
+  - pkg/proto/hapi/services
+  - pkg/proto/hapi/version
+  - pkg/provenance
+  - pkg/releaseutil
+  - pkg/renderutil
+  - pkg/repo
+  - pkg/storage/errors
+  - pkg/sympath
+  - pkg/tlsutil
+  - pkg/urlutil
+  - pkg/version
+testImports: []

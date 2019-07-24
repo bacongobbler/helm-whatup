@@ -1,0 +1,493 @@
+#!/bin/bash
+
+## Usage: ./changelog <new|release> [DATA]
+##
+##      new <ENTRY DESCRIPTION>
+##              Creates a new Changelog File/ Entry
+##
+##      release <VERSION> [pre-release] [do-not-remove-pre-release-data]
+##              (Re-)Generates the Changelog.
+##              If Release is a Pre-Release append 'true' after the Version
+##
+##      update
+##              Check if there is a newer Version of this Script avaible
+##
+##      version
+##              Prints the Version of the Script
+##
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+VERSION="1.3.1"
+
+## Functions ###
+function checkDir {
+        if [[ ! -d "${DIR}/.changelogs/unreleased" || ! -d "${DIR}/.changelogs/released" ]];
+        then
+                mkdir -p ${DIR}/.changelogs/unreleased
+                mkdir -p ${DIR}/.changelogs/released
+        fi
+}
+
+
+typeofvar () {
+
+    local type_signature=$(declare -p "$1" 2>/dev/null)
+
+    if [[ "$type_signature" =~ "declare --" ]]; then
+        printf "string"
+    elif [[ "$type_signature" =~ "declare -a" ]]; then
+        printf "array"
+    elif [[ "$type_signature" =~ "declare -A" ]]; then
+        printf "map"
+    else
+        printf "none"
+    fi
+
+}
+
+
+function update() {
+	## download the actual Version of the Script
+	acc_ver=$(curl --silent https://gitlab.com/l0nax/changelog/raw/master/.version)
+
+	if [[ ${acc_ver} != [[${VERSION}]] ]];
+	then
+		# compare Major, Minor and Build
+                acc_major=$(($(echo -n ${acc_ver} | cut -d'.' -f1)))
+                acc_minor=$(($(echo -n ${acc_ver} | cut -d'.' -f2)))
+                acc_build=$(($(echo -n ${acc_ver} | cut -d'.' -f3)))
+
+                major=$(($(echo -n ${VERSION} | cut -d'.' -f1)))
+                minor=$(($(echo -n ${VERSION} | cut -d'.' -f2)))
+                build=$(($(echo -n ${VERSION} | cut -d'.' -f3)))
+
+		if (( ${acc_major} > ${major} ||  ${acc_minor} > ${minor} ||
+                        ${acc_build} > ${build} ));
+		then
+			echo "[i] Found newer Version of changelog-Script"
+			echo "[i] Version of this Script..: ${VERSION}"
+			echo "[i] Version of GitLab-Script: ${acc_ver}"
+			echo ""
+			echo "[i] Downloading newer Script from gitlab.com..."
+
+			# download newer Changelog Script
+			curl --silent https://gitlab.com/l0nax/changelog/raw/master/changelog -o /tmp/changelog
+			mv /tmp/changelog ${DIR}/changelog
+			chmod +x ${DIR}/changelog
+
+			echo "[i] Script successfull Updated!"
+                        echo "[i] Opening Changelog Details..."
+
+                        # git log --all --grep="${acc_ver}"
+                fi
+	else
+		echo "[i] This is the newest Version!"
+	fi
+}
+
+## $1       string to repeat
+## $2       number of times to repeat
+function repeat {
+    local ret=""
+
+    for i in `seq 1 ${2}`
+    do
+        ret="${ret}${1}"
+    done
+
+    printf "%s" ${ret}
+}
+
+function improveChangelog {
+    for ((i=16; i>3; i--))
+    do
+        _str=$(repeat "\n" ${i})
+
+        sed ":a;$!{N;s/${_str}/\n\n/;ba;}" ${1} > ${1}_2
+    done
+
+    ## write new Content to ${1}_2
+    cat ${1} > ${1}_2
+}
+
+function version() {
+        echo "[i] Current Version: ${VERSION}"
+}
+
+## Prints/ Puts (and formats) Changelog Entries to
+## File
+##
+## $1:  Output File
+## $2:  Count (Number of Entries) - Starts at 1 (NOT 0!!!)
+## $3:  Content/ Changes Array
+function printChanges() {
+        local changelog_file="${1}" && shift
+        local count=$(( ${1}-1 )) && shift
+        local data_arr=( "${@}" )
+
+        for i in `seq 0 ${count}`
+        do
+            ## get Content
+            content=${data_arr[${i}]}
+
+            ## add Content to Changelog
+            echo "- ${content}" >> ${changelog_file}
+        done
+}
+
+### CODE ###
+
+checkDir
+
+if [[ "$1" = "update" ]];
+then
+	version
+	update
+
+	exit 0
+fi
+
+if [[ "$1" = "version" ]];
+then
+	# TODO: Add more Informations about Script...!!
+        version
+
+	exit 0
+fi
+
+if [[ "$1" = "new" ]];
+then
+    ## get Branch Name
+    branch="$(git symbolic-ref HEAD | sed -e 's+refs/heads/++g')"
+
+    # replace '/' with '_'
+    branch="$(echo ${branch} | sed -e 's+/+_+g')"
+
+    ## get Entry Description
+    desc=$2
+
+    ## get Entry Type from User Input
+    echo "Please Enter Entry Type:"
+    echo "[1] New Feature (Added)"
+    echo "[2] Bug Fix (Fixed)"
+    echo "[3] Feature change (Changed)"
+    echo "[4] New deprecation (Deprecated)"
+    echo "[5] Feature removal (Removed)"
+    echo "[6] Security fix (Security)"
+#       echo "[7] Other "
+    echo -e ">>> \c"
+    read entryType
+
+#    ## get Append Number
+#    num=$(ls -1q "${DIR}/.changelogs/unreleased/" | grep "${branch}" | wc --lines)
+    ## generate Number
+    ##  ~ Why random Number? Because if you use this Script in a Team of (eg)
+    ##          10 Peoples and they create a Changelog Entry in the same Branch
+    ##          and you merge those two Commits then you will have a Merge Error
+    ##  ~ Why only 6 chars? Because we have [a-zA-Z0-9] => 26 + 26 + 10 = 62
+    ##          so we have 6^62 possible String Combinations (1,7594524E48)
+    num=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 6 | head -n 1)
+
+    # if [[ ! "${num}" -eq 0 ]];
+    # then
+    #     num=$((num+1))
+    #     file="${DIR}/.changelogs/unreleased/$branch-$num"
+    #
+    # else # no Files exists with this Name
+    #     file="${DIR}/.changelogs/unreleased/$branch"
+    # fi
+    file="${DIR}/.changelogs/unreleased/${branch}-${num}"
+
+
+    ## write Entry to File
+    echo "title: ${2}" >> ${file}
+    echo "type: ${entryType}" >> ${file}
+
+    exit 0
+fi
+
+if [[ "$1" = "release" ]];
+then
+    top_level=$(git rev-parse --show-toplevel)
+    c="${top_level}/CHANGELOG.md"
+
+    ## create Backup of old CHANGELOG.md
+    back="${c}.bak"
+    cp ${c} ${back}
+
+    ## get new Version
+    version="$2"
+
+    oldChangelog_tmp="${DIR}/tmp_changelog-old"
+
+    ## parse Changelog File without Line 1, 2, 3, 4 and 5
+    cat ${c} | sed -e '1d;2d;3d;4d;5d;' > ${oldChangelog_tmp} ## Reference: https://unix.stackexchange.com/a/55757
+
+    if [[ -z "$4" ]];
+    then
+        ## remove Pre-Release Data from CHANGELOG.md
+        awk 'BEGIN {p=1};/^<\!\-\- start pre\-release \-\->/ {print;p=0}; /^<\!\-\- end pre\-release \-\->/ {p=1}; p' \
+            ${oldChangelog_tmp} | grep -v '<!-- start pre-release -->' | grep -v '<!-- end pre-release -->' > ${oldChangelog_tmp}2
+        rm ${oldChangelog_tmp}
+        mv ${oldChangelog_tmp}2 ${oldChangelog_tmp}
+    fi
+
+    changelogNotice="# Changelog\n\n"
+    changelogNotice="${changelogNotice}All notable changes to this project will be documented in this file.\n\n"
+    changelogNotice="${changelogNotice}The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).\n\n"
+
+    ### VARIABLES ###
+    count=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0) ## see for the 'Entry Type' Number [added more Number for the Future]
+    newFeature=()
+    bugFix=()
+    featureChange=()
+    newDepreaction=()
+    featureRemoval=()
+    securityFix=()
+    other=()
+
+    i=0
+
+    ## get all Changelog Files
+    for file in ${DIR}/.changelogs/unreleased/*
+    do
+        ## get type and title
+        title="$(cat ${file} | head -n 1 | sed -e 's+title: ++g')"
+        type=$(cat ${file} | sed -e '1d' | sed -e 's+type: ++g')
+        type=$((type))
+
+        ## add Content to array
+        case ${type} in
+            1) # New Feature
+                _i=$((${#newFeature[*]}))
+
+                count[0]=$((count[0]+1))
+                newFeature[${_i}]="${title}"
+                ;;
+
+            2) # Bug Fix
+                _i=$((${#bugFix[*]}))
+
+                count[1]=$((count[1]+1))
+                bugFix[${_i}]="${title}"
+                ;;
+
+            3) # Feature Change
+                _i=$((${#featureChange[*]}))
+
+                count[2]=$((count[2]+1))
+                featureChange[${_i}]="${title}"
+                ;;
+
+            4) # New deprecation
+                _i=$((${#newDepreaction[*]}))
+
+                count[3]=$((count[3]+1))
+                newDepreaction[${_i}]="${title}"
+                ;;
+
+            5) # Feature removal
+                _i=$((${#featureRemoval[*]}))
+
+                count[4]=$((count[4]+1))
+                featureRemoval[${_i}]="${title}"
+                ;;
+
+            6) # Security Fix
+                _i=$((${#securityFix[*]}))
+
+                count[5]=$((count[5]+1))
+                securityFix[${_i}]="${title}"
+                ;;
+
+#            7) # Other
+#
+#                ;;
+        esac
+
+        ## increase ${i}
+        i=$((i+1))
+    done
+
+    ## print Changelog Header to new CHANGELOG.md
+    echo -e ${changelogNotice} > ${c}
+
+    ## is NOT Pre-Release?
+    if [[ -z "$3" ]];
+    then
+        # create new Release Directory
+        mkdir ${DIR}/.changelogs/released/${version}
+
+        ## move all Files located at '.changelogs/unreleased' to '.changelogs/released/VERSION'
+        for file in ${DIR}/.changelogs/unreleased/*
+        do
+            mv ${file} ${DIR}/.changelogs/released/${version}/
+        done
+    else # is Pre-Release
+        ## add '<!-- start pre-release -->' to the Top of the new Changelog File
+        echo -e "\n<!-- start pre-release -->" >> ${c}
+    fi
+
+    date="$(date +%Y-%m-%d)"
+
+    ## generate new CHANGELOG.md
+    echo "## ${version} (${date})" >> ${c}
+    echo "" >> ${c}
+
+    unset i
+
+    ### get all Content from Arrays
+    ## 1)
+    if [[ ! "${count[0]}" -eq "0" ]]; then
+        if [[ "${count[0]}" -eq "1" ]]; then
+            _strChange="change"
+        else
+            _strChange="changes"
+        fi
+
+        echo -e "### Added (${count[0]} ${_strChange})\n" >> ${c}
+
+        ## print Changes
+        printChanges ${c} ${count[0]} "${newFeature[@]}"
+        # count[0]=$((${count[0]}-1))
+        # for i in `seq 0 ${count[0]}`
+        # do
+        #     ## get Content
+        #     content=${newFeature[${i}]}
+        #
+        #     ## add Content to Changelog
+        #     echo "- ${content}" >> ${c}
+        # done
+    fi
+
+
+    ## 2)
+    if [[ ! "${count[1]}" -eq "0" ]]; then
+        if [[ "${count[1]}" -eq "1" ]]; then
+            _strChange="change"
+        else
+            _strChange="changes"
+        fi
+
+        echo -e "\n### Fixed (${count[1]} ${_strChange})\n" >> ${c}
+
+        ## print Changes
+        printChanges ${c} ${count[1]} "${bugFix[@]}"
+        # count[1]=$((${count[1]}-1))
+        # for i in `seq 0 ${count[1]}`
+        # do
+        #     ## get Content
+        #     content=${bugFix[${i}]}
+        #
+        #     ## add Content to Changelog
+        #     echo "- ${content}" >> ${c}
+        # done
+    fi
+
+    ## 3)
+    if [[ ! "${count[2]}" -eq "0" ]]; then
+        if [[ "${count[2]}" -eq "1" ]]; then
+            _strChange="change"
+        else
+            _strChange="changes"
+        fi
+
+        echo -e "\n### Changed (${count[2]} ${_strChange})\n" >> ${c}
+
+        ## print Changes
+        printChanges ${c} ${count[2]} "${featureChange[@]}"
+        # count[2]=$((${count[2]}-1))
+        # for i in `seq 0 ${count[2]}`
+        # do
+        #     ## get Content
+        #     content=${featureChange[${i}]}
+        #
+        #     ## add Content to Changelog
+        #     echo "- ${content}" >> ${c}
+        # done
+    fi
+
+    ## 4)
+    if [[ ! "${count[3]}" -eq "0" ]]; then
+        if [[ "${count[3]}" -eq "1" ]]; then
+            _strChange="change"
+        else
+            _strChange="changes"
+        fi
+
+        echo -e "\n### Deprecated (${count[3]} ${_strChange})\n" >> ${c}
+
+        ## print Changes
+        printChanges ${c} ${count[3]} "${newDepreaction[@]}"
+        # count[3]=$((${count[3]}-1))
+        # for i in `seq 0 ${count[3]}`
+        # do
+        #     ## get Content
+        #     content=${newDepreaction[${i}]}
+        #
+        #     ## add Content to Changelog
+        #     echo "- ${content}" >> ${c}
+        # done
+    fi
+
+    ## 5)
+    if [[ ! "${count[4]}" -eq "0" ]]; then
+        if [[ "${count[4]}" -eq "1" ]]; then
+            _strChange="change"
+        else
+            _strChange="changes"
+        fi
+
+        echo -e "\n### Removed (${count[4]} ${_strChange})\n" >> ${c}
+
+        ## print Changes
+        printChanges ${c} ${count[4]} "${featureRemoval[@]}"
+        # count[4]=$((${count[4]}-1))
+        # for i in `seq 0 ${count[4]}`
+        # do
+        #     ## get Content
+        #     content=${featureRemoval[${i}]}
+        #
+        #     ## add Content to Changelog
+        #     echo "- ${content}" >> ${c}
+        # done
+    fi
+
+    ## 6)
+    if [[ ! "${count[5]}" -eq "0" ]]; then
+        if [[ "${count[5]}" -eq "1" ]]; then
+            _strChange="change"
+        else
+            _strChange="changes"
+        fi
+
+        echo -e "\n### Security (${count[5]} ${_strChange})\n" >> ${c}
+
+        ## print Changes
+        printChanges ${c} ${count[5]} "${securityFix[@]}"
+        # count[5]=$((${count[5]}-1))
+        # for i in `seq 0 ${count[5]}`
+        # do
+        #     ## get Content
+        #     content=${securityFix[${i}]}
+        #
+        #     ## add Content to Changelog
+        #     echo "- ${content}" >> ${c}
+        # done
+    fi
+
+    ## [end]
+    if [[ ! -z "$3" ]]; then
+        echo -e "<!-- end pre-release -->" >> ${c}
+    fi
+
+    ## print old Changelog Content
+    echo "" >> ${c}
+    cat ${oldChangelog_tmp} >> ${c}
+
+    improveChangelog ${c}
+
+    ## delete all Temp Files
+    rm ${back}              # Changelog Backup
+    rm ${oldChangelog_tmp}  # (modified) old Changelog Temp
+fi

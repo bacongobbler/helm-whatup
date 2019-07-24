@@ -1,6 +1,0 @@
-[[constraint]]
-  name = "github.com/spf13/cobra"
-
-[[constraint]]
-  name = "k8s.io/helm"
-  version = "2.11.0"
