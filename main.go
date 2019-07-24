@@ -86,24 +86,24 @@ func run(cmd *cobra.Command, args []string) error {
 
 	var result []ChartVersionInfo
 
-	for _, release := range releases {
+	for _, helmRelease := range releases {
 		for _, idx := range repositories {
-			if idx.Has(release.Chart.Metadata.Name, release.Chart.Metadata.Version) {
-				// fetch latest release
+			if idx.Has(helmRelease.Chart.Metadata.Name, helmRelease.Chart.Metadata.Version) {
+				// fetch latest helm_release
 				constraint := ""
 				// Include pre-releases
 				if devel {
 					constraint = ">= *-0"
 				}
-				chartVer, err := idx.Get(release.Chart.Metadata.Name, constraint)
+				chartVer, err := idx.Get(helmRelease.Chart.Metadata.Name, constraint)
 				if err != nil {
 					return err
 				}
 
 				versionStatus := ChartVersionInfo{
-					ReleaseName:      release.Name,
-					ChartName:        release.Chart.Metadata.Name,
-					InstalledVersion: release.Chart.Metadata.Version,
+					ReleaseName:      helmRelease.Name,
+					ChartName:        helmRelease.Chart.Metadata.Name,
+					InstalledVersion: helmRelease.Chart.Metadata.Version,
 					LatestVersion:    chartVer.Version,
 				}
 
@@ -136,7 +136,7 @@ func run(cmd *cobra.Command, args []string) error {
 	case "plain":
 		for _, versionInfo := range result {
 			if versionInfo.LatestVersion != versionInfo.InstalledVersion {
-				fmt.Printf("There is an update available for release %s (%s)!\nInstalled version: %s\nAvailable version: %s\n", versionInfo.ReleaseName, versionInfo.ChartName, versionInfo.InstalledVersion, versionInfo.LatestVersion)
+				fmt.Printf("There is an update available for helm_release %s (%s)!\nInstalled version: %s\nAvailable version: %s\n", versionInfo.ReleaseName, versionInfo.ChartName, versionInfo.InstalledVersion, versionInfo.LatestVersion)
 			} else {
 				fmt.Printf("Release %s (%s) is up to date.\n", versionInfo.ReleaseName, versionInfo.LatestVersion)
 			}
