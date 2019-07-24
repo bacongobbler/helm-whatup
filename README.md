@@ -36,7 +36,7 @@ If you would like to handle the build yourself, instead of fetching a binary, th
 First, set up your environment:
 
 - You need to have [Go](http://golang.org) installed. Make sure to set `$GOPATH`
-- If you don't have [Glide](http://glide.sh) installed, this will install it into `$GOPATH/bin` for you.
+- You need to have [Glide](http://glide.sh) installed.
 
 Clone this repo into your `$GOPATH` using git.
 

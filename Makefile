@@ -20,7 +20,4 @@ dist:
 
 .PHONY: bootstrap
 bootstrap:
-ifndef HAS_DEP
-	go get -u github.com/golang/dep/cmd/dep
-endif
-	dep ensure -v
+	glide install
