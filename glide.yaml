@@ -5,12 +5,12 @@ import:
 - package: gopkg.in/yaml.v2
   version: ^2.2.2
 - package: k8s.io/client-go
-  version: kubernetes-1.15.0
+  version: kubernetes-1.14.1
   subpackages:
   - kubernetes
   - rest
 - package: k8s.io/helm
-  version: ^2.14.1
+  version: ^2.14.2
   subpackages:
   - pkg/helm
   - pkg/helm/environment
