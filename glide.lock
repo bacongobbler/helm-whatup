@@ -1,5 +1,5 @@
-hash: 447b616d3a496e0c7fc274d63b3268639e33b5001f4891ce3bb5a139d2a17825
-updated: 2019-07-24T21:22:22.166376272+02:00
+hash: c4a17c72d44a44ddec698454e0505a11ad2163d9fb213771abc6a39874210593
+updated: 2019-07-24T22:21:24.904432551+02:00
 imports:
 - name: github.com/BurntSushi/toml
   version: 3012a1dbe2e4bd1391d42b32f0577cb7bbc7f005
@@ -33,6 +33,8 @@ imports:
   version: 9316a62528ac99aaecb4e47eadd6dc8aa6533d58
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/jedib0t/go-pretty
+  version: b5d36c1d5faf07737526e2a983b46b3252546897
 - name: github.com/Masterminds/goutils
   version: 41ac8693c5c10a92ea1ff5ac3a7f95646f6123b0
 - name: github.com/Masterminds/semver

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jedib0t/go-pretty/table"
+
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
@@ -47,7 +49,7 @@ func main() {
 		RunE:  run,
 	}
 
-	cmd.Flags().StringVarP(&outputFormat, "output", "o", "plain", "Output format, choose from plain, json, yaml")
+	cmd.Flags().StringVarP(&outputFormat, "output", "o", "table", "Output format, choose from plain, json, yaml, table")
 	cmd.Flags().BoolVarP(&devel, "devel", "d", false, "Whether to include pre-releases or not, defaults to false.")
 
 	if err := cmd.Execute(); err != nil {
@@ -116,6 +118,21 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 
 	switch outputFormat {
+	case "table":
+		_table := table.NewWriter()
+		_table.SetOutputMirror(os.Stdout)
+
+		_table.AppendHeader(table.Row{"Release Name", "Installed version", "Available version"})
+
+		for _, versionInfo := range result {
+			if versionInfo.LatestVersion != versionInfo.InstalledVersion {
+				_table.AppendRow(table.Row{versionInfo.ReleaseName, versionInfo.InstalledVersion, versionInfo.LatestVersion})
+			}
+		}
+
+		// print Table
+		_table.Render()
+
 	case "plain":
 		for _, versionInfo := range result {
 			if versionInfo.LatestVersion != versionInfo.InstalledVersion {
