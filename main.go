@@ -25,9 +25,7 @@ var outputFormat string
 var devel bool
 var version = "canary"
 
-var (
-	settings 		helmenv.EnvSettings
-)
+var settings 		helmenv.EnvSettings
 
 const (
 	statusOutdated = "OUTDATED"
