@@ -3,7 +3,7 @@
 # Combination of the Glide and Helm scripts, with my own tweaks.
 
 PROJECT_NAME="helm-whatup"
-PROJECT_GH="bacongobbler/$PROJECT_NAME"
+PROJECT_GH="fabmation-gmbh/$PROJECT_NAME"
 
 : ${HELM_PLUGIN_PATH:="$HELM_HOME/plugins/helm-whatup"}
 
