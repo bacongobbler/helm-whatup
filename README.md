@@ -1,5 +1,10 @@
 # Helm Whatup
 
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=for-the-badge)](/LICENSE.md)
+[![Maintainability](https://api.codeclimate.com/v1/badges/ec4254803f465c1c8a58/maintainability)](https://codeclimate.com/github/fabmation-gmbh/helm-whatup/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/ec4254803f465c1c8a58/test_coverage)](https://codeclimate.com/github/fabmation-gmbh/helm-whatup/test_coverage)
+
+
 This Repo is a fork of [bacongobbler/helm-whatup][], because the original project is no longer actively further developed.
 
 This is a Helm plugin to help users determine if there's an update available for their installed charts.
@@ -10,8 +15,8 @@ the version against the latest deployed version of your charts in the Kubernetes
 ## Usage
 
 ```
-$ helm repo update
-$ helm whatup
+helm repo update
+helm whatup
 ```
 
 
@@ -31,7 +36,7 @@ If you would like to handle the build yourself, instead of fetching a binary, th
 First, set up your environment:
 
 - You need to have [Go](http://golang.org) installed. Make sure to set `$GOPATH`
-- If you don't have [Glide](http://glide.sh) installed, this will install it into `$GOPATH/bin` for you.
+- You need to have [Glide](http://glide.sh) installed.
 
 Clone this repo into your `$GOPATH` using git.
 

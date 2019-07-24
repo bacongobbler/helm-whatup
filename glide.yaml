@@ -1,0 +1,24 @@
+package: github.com/fabmation-gmbh/helm-whatup
+import:
+- package: github.com/spf13/cobra
+  version: ^0.0.5
+- package: gopkg.in/yaml.v2
+  version: ^2.2.2
+- package: golang.org/x/sys/unix
+- package: k8s.io/cloud-provider
+  version: kubernetes-1.14.1
+- package: k8s.io/client-go
+  version: kubernetes-1.14.1
+  subpackages:
+  - kubernetes
+  - rest
+- package: k8s.io/helm
+  version: 2.14.1
+  subpackages:
+  - pkg/helm
+  - pkg/helm/environment
+  - pkg/helm/portforwarder
+  - pkg/kube
+  - pkg/proto/hapi/release
+  - pkg/repo
+  - pkg/tlsutil
