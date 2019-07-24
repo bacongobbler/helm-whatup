@@ -8,12 +8,8 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 	"k8s.io/helm/pkg/helm"
 	helmenv "k8s.io/helm/pkg/helm/environment"
-	"k8s.io/helm/pkg/helm/portforwarder"
-	"k8s.io/helm/pkg/kube"
 	"k8s.io/helm/pkg/proto/hapi/release"
 	"k8s.io/helm/pkg/repo"
 	"k8s.io/helm/pkg/tlsutil"
@@ -28,7 +24,6 @@ var devel bool
 var version = "canary"
 
 var (
-	tillerTunnel 	*kube.Tunnel
 	settings 		helmenv.EnvSettings
 )
 
@@ -158,19 +153,17 @@ func run(cmd *cobra.Command, args []string) error {
 func newClient() *helm.Client {
 	/// === Pre-Checks ===
 	if settings.TillerHost == "" {
-		config, client, err := getKubeClient(settings.KubeContext, settings.KubeConfig)
-		if err != nil {
-			fmt.Errorf("could not get K8s Config: %s", err)
-			os.Exit(1)
+		if os.Getenv("TILLER_HOST") != "" {
+			settings.TillerHost = os.Getenv("TILLER_HOST")
+
+		} else if os.Getenv("HELM_HOST") != "" {
+			settings.TillerHost = os.Getenv("HELM_HOST")
 		}
 
-		tillerTunnel, err = portforwarder.New(settings.TillerNamespace, client, config)
-		if err != nil {
-			fmt.Errorf("could not create Tiller Tunnel: %s", err)
+		if settings.TillerHost == "" {
+			fmt.Errorf("error: Tiller Host not set")
 			os.Exit(1)
 		}
-
-		settings.TillerHost = fmt.Sprintf("127.0.0.1:%d", tillerTunnel.Local)
 	}
 
 	if settings.TLSCaCertFile == helmenv.DefaultTLSCaCert || settings.TLSCaCertFile == "" {
@@ -248,35 +241,4 @@ func fetchIndices(client *helm.Client) ([]*repo.IndexFile, error) {
 	}
 
 	return indices, nil
-}
-
-
-
-/// --- Copied from helm git-Repo --- ///
-// configForContext creates a Kubernetes REST client configuration for a given kubeconfig context.
-func configForContext(context string, kubeconfig string) (*rest.Config, error) {
-	config, err := kube.GetConfig(context, kubeconfig).ClientConfig()
-
-	if err != nil {
-		return nil, fmt.Errorf("could not get Kubernetes config for context %q: %s", context, err)
-	}
-
-	return config, nil
-}
-
-// getKubeClient creates a Kubernetes config and client for a given kubeconfig context.
-func getKubeClient(context string, kubeconfig string) (*rest.Config, kubernetes.Interface, error) {
-	config, err := configForContext(context, kubeconfig)
-
-	if err != nil {
-		return nil, nil, err
-	}
-
-	client, err := kubernetes.NewForConfig(config)
-
-	if err != nil {
-		return nil, nil, fmt.Errorf("could not get Kubernetes client: %s", err)
-	}
-
-	return config, client, nil
 }
