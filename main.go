@@ -32,12 +32,13 @@ const (
 	statusUptodate = "UPTODATE"
 )
 
+// Struct containing all relevant Informations about Chart Releases in Tiller/ Helm
 type ChartVersionInfo struct {
-	ReleaseName      string `json:"releaseName"`
-	ChartName        string `json:"chartName"`
-	InstalledVersion string `json:"installedVersion"`
-	LatestVersion    string `json:"latestVersion"`
-	Status           string `json:"status"`
+	ReleaseName      string `json:"releaseName"`		// Helm Release Name
+	ChartName        string `json:"chartName"`			// Chart Name of the Release
+	InstalledVersion string `json:"installedVersion"`	// Installed Chart Version
+	LatestVersion    string `json:"latestVersion"`		// Latest available Version of Chart
+	Status           string `json:"status"`				// Status of Release: Is Release UpToDate or Outdated
 }
 
 func main() {
