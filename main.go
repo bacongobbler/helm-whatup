@@ -8,9 +8,15 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/helm/pkg/helm"
+	helmenv "k8s.io/helm/pkg/helm/environment"
+	"k8s.io/helm/pkg/helm/portforwarder"
+	"k8s.io/helm/pkg/kube"
 	"k8s.io/helm/pkg/proto/hapi/release"
 	"k8s.io/helm/pkg/repo"
+	"k8s.io/helm/pkg/tlsutil"
 )
 
 const globalUsage = `
@@ -19,8 +25,12 @@ Check to see if there is an updated version available for installed charts.
 
 var outputFormat string
 var devel bool
-
 var version = "canary"
+
+var (
+	tillerTunnel 	*kube.Tunnel
+	settings 		helmenv.EnvSettings
+)
 
 const (
 	statusOutdated = "OUTDATED"
@@ -51,7 +61,7 @@ func main() {
 }
 
 func run(cmd *cobra.Command, args []string) error {
-	client := helm.NewClient(helm.Host(os.Getenv("TILLER_HOST")))
+	client := newClient()
 
 	releases, err := fetchReleases(client)
 	if err != nil {
@@ -120,12 +130,14 @@ func run(cmd *cobra.Command, args []string) error {
 			}
 		}
 		fmt.Println("Done.")
+
 	case "json":
 		outputBytes, err := json.MarshalIndent(result, "", "    ")
 		if err != nil {
 			return err
 		}
 		fmt.Println(string(outputBytes))
+
 	case "yml":
 		fallthrough
 	case "yaml":
@@ -134,6 +146,7 @@ func run(cmd *cobra.Command, args []string) error {
 			return err
 		}
 		fmt.Println(string(outputBytes))
+
 	default:
 		return fmt.Errorf("invalid formatter: %s", outputFormat)
 	}
@@ -141,14 +154,79 @@ func run(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+
+func newClient() *helm.Client {
+	/// === Pre-Checks ===
+	if settings.TillerHost == "" {
+		config, client, err := getKubeClient(settings.KubeContext, settings.KubeConfig)
+		if err != nil {
+			fmt.Errorf("could not get K8s Config: %s", err)
+			os.Exit(1)
+		}
+
+		tillerTunnel, err = portforwarder.New(settings.TillerNamespace, client, config)
+		if err != nil {
+			fmt.Errorf("could not create Tiller Tunnel: %s", err)
+			os.Exit(1)
+		}
+
+		settings.TillerHost = fmt.Sprintf("127.0.0.1:%d", tillerTunnel.Local)
+	}
+
+	if settings.TLSCaCertFile == helmenv.DefaultTLSCaCert || settings.TLSCaCertFile == "" {
+		settings.TLSCaCertFile = settings.Home.TLSCaCert()
+	} else {
+		settings.TLSCaCertFile = os.ExpandEnv(settings.TLSCaCertFile)
+	}
+
+	if settings.TLSCertFile == helmenv.DefaultTLSCert || settings.TLSCertFile == "" {
+		settings.TLSCertFile = settings.Home.TLSCert()
+	} else {
+		settings.TLSCertFile = os.ExpandEnv(settings.TLSCertFile)
+	}
+
+	if settings.TLSKeyFile == helmenv.DefaultTLSKeyFile || settings.TLSKeyFile == "" {
+		settings.TLSKeyFile = settings.Home.TLSKey()
+	} else {
+		settings.TLSKeyFile = os.ExpandEnv(settings.TLSKeyFile)
+	}
+
+	options := []helm.Option{ helm.Host(settings.TillerHost) }
+
+	// check if TLS is enabled
+	if settings.TLSEnable || settings.TLSVerify {
+		tlsopts := tlsutil.Options{
+			ServerName:			settings.TillerHost,
+			CaCertFile:			settings.TLSCaCertFile,
+			CertFile:			settings.TLSCertFile,
+			KeyFile:			settings.TLSKeyFile,
+			InsecureSkipVerify:	!settings.TLSVerify,
+		}
+
+		tlscfg, err := tlsutil.ClientConfig(tlsopts)
+
+		if err != nil {
+			_, _ = fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+
+		options = append(options, helm.WithTLS(tlscfg))
+	}
+
+	return helm.NewClient(options...)
+}
+
 func fetchReleases(client *helm.Client) ([]*release.Release, error) {
 	res, err := client.ListReleases()
+
 	if err != nil {
 		return nil, err
 	}
+
 	if res == nil {
 		return []*release.Release{}, nil
 	}
+
 	return res.Releases, nil
 }
 
@@ -156,9 +234,11 @@ func fetchIndices(client *helm.Client) ([]*repo.IndexFile, error) {
 	indices := []*repo.IndexFile{}
 	rfp := os.Getenv("HELM_PATH_REPOSITORY_FILE")
 	repofile, err := repo.LoadRepositoriesFile(rfp)
+
 	if err != nil {
 		return nil, fmt.Errorf("could not load repositories file '%s': %s", rfp, err)
 	}
+
 	for _, repository := range repofile.Repositories {
 		idx, err := repo.LoadIndexFile(repository.Cache)
 		if err != nil {
@@ -166,5 +246,37 @@ func fetchIndices(client *helm.Client) ([]*repo.IndexFile, error) {
 		}
 		indices = append(indices, idx)
 	}
+
 	return indices, nil
+}
+
+
+
+/// --- Copied from helm git-Repo --- ///
+// configForContext creates a Kubernetes REST client configuration for a given kubeconfig context.
+func configForContext(context string, kubeconfig string) (*rest.Config, error) {
+	config, err := kube.GetConfig(context, kubeconfig).ClientConfig()
+
+	if err != nil {
+		return nil, fmt.Errorf("could not get Kubernetes config for context %q: %s", context, err)
+	}
+
+	return config, nil
+}
+
+// getKubeClient creates a Kubernetes config and client for a given kubeconfig context.
+func getKubeClient(context string, kubeconfig string) (*rest.Config, kubernetes.Interface, error) {
+	config, err := configForContext(context, kubeconfig)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	client, err := kubernetes.NewForConfig(config)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("could not get Kubernetes client: %s", err)
+	}
+
+	return config, client, nil
 }
