@@ -116,6 +116,21 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 
 	switch outputFormat {
+	case "table":
+		_table := table.NewWriter()
+		_table.SetOutputMirror(os.Stdout)
+
+		_table.AppendHeader(table.Row{"Release Name", "Installed version", "Available version"})
+
+		for _, versionInfo := range result {
+			if versionInfo.LatestVersion != versionInfo.InstalledVersion {
+				_table.AppendRow(table.Row{versionInfo.ReleaseName, versionInfo.InstalledVersion, versionInfo.LatestVersion})
+			}
+		}
+
+		// print Table
+		_table.Render()
+
 	case "plain":
 		for _, versionInfo := range result {
 			if versionInfo.LatestVersion != versionInfo.InstalledVersion {
