@@ -4,7 +4,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/ec4254803f465c1c8a58/maintainability)](https://codeclimate.com/github/fabmation-gmbh/helm-whatup/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/ec4254803f465c1c8a58/test_coverage)](https://codeclimate.com/github/fabmation-gmbh/helm-whatup/test_coverage)
 [![Go Report Card](https://goreportcard.com/badge/github.com/fabmation-gmbh/helm-whatup)](https://goreportcard.com/report/github.com/fabmation-gmbh/helm-whatup)
-
+[![Build Status](https://travis-ci.org/fabmation-gmbh/helm-whatup.svg?branch=master)](https://travis-ci.org/fabmation-gmbh/helm-whatup)
 
 This Repo is a fork of [bacongobbler/helm-whatup][], because the original project is no longer actively further developed.
 
