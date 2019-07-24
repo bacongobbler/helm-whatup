@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jedib0t/go-pretty/table"
+
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
