@@ -27,7 +27,7 @@ ORIGINAL LICENSE:
 =================
 
 
-Helm Template Plugin
+Helm Whatup Plugin
 Copyright (C) 2017, Matthew Fisher
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
