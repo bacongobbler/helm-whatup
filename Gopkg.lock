@@ -280,8 +280,10 @@
     "github.com/spf13/cobra",
     "gopkg.in/yaml.v2",
     "k8s.io/helm/pkg/helm",
+    "k8s.io/helm/pkg/helm/environment",
     "k8s.io/helm/pkg/proto/hapi/release",
     "k8s.io/helm/pkg/repo",
+    "k8s.io/helm/pkg/tlsutil",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
