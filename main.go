@@ -49,7 +49,7 @@ func main() {
 		RunE:  run,
 	}
 
-	cmd.Flags().StringVarP(&outputFormat, "output", "o", "plain", "Output format, choose from plain, json, yaml")
+	cmd.Flags().StringVarP(&outputFormat, "output", "o", "table", "Output format, choose from plain, json, yaml, table")
 	cmd.Flags().BoolVarP(&devel, "devel", "d", false, "Whether to include pre-releases or not, defaults to false.")
 
 	if err := cmd.Execute(); err != nil {
