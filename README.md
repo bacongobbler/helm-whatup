@@ -18,7 +18,7 @@ the version against the latest deployed version of your charts in the Kubernetes
 
 ## Usage
 
-```
+```bash
 helm repo update
 helm whatup
 ```
@@ -26,7 +26,7 @@ helm whatup
 
 ## Install
 
-```
+```bash
 $ helm plugin install https://github.com/fabmation-gmbh/helm-whatup
 ```
 
@@ -44,7 +44,7 @@ First, set up your environment:
 
 Clone this repo into your `$GOPATH` using git.
 
-```
+```bash
 mkdir $GOPATH/src/github.com/fabmation-gmbh
 cd $GOPATH/src/github.com/fabmation-gmbh
 git clone https://github.com/fabmation-gmbh/helm-whatup
@@ -52,7 +52,7 @@ git clone https://github.com/fabmation-gmbh/helm-whatup
 
 Then run the following to get running.
 
-```
+```bash
 cd helm-whatup
 make bootstrap build
 SKIP_BIN_INSTALL=1 helm plugin install $GOPATH/src/github.com/fabmation-gmbh/helm-whatup
