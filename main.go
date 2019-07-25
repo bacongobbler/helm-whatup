@@ -75,13 +75,6 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	if len(repositories) == 0 {
-		if outputFormat == "plain" || outputFormat == "table" {
-			fmt.Println("No repositories found. Did you run `helm repo update`?")
-		}
-		return nil
-	}
-
 	result, err := parseReleases(releases, repositories)
 	if err != nil {
 		return err
@@ -277,6 +270,10 @@ func fetchIndices(client *helm.Client) ([]*repo.IndexFile, error) {
 
 	if err != nil {
 		return nil, fmt.Errorf("could not load repositories file '%s': %s", rfp, err)
+	}
+
+	if len(repofile.Repositories) == 0 {
+		return nil, errors.New("no repositories found. run `helm repo update` and re-try")
 	}
 
 	for _, repository := range repofile.Repositories {
