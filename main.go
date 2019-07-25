@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -72,13 +73,6 @@ func run(cmd *cobra.Command, args []string) error {
 	repositories, err := fetchIndices(client)
 	if err != nil {
 		return err
-	}
-
-	if len(releases) == 0 {
-		if outputFormat == "plain" || outputFormat == "table" {
-			fmt.Println("No releases found. All up to date!")
-		}
-		return nil
 	}
 
 	if len(repositories) == 0 {
@@ -270,7 +264,7 @@ func fetchReleases(client *helm.Client) ([]*release.Release, error) {
 	}
 
 	if res == nil {
-		return []*release.Release{}, nil
+		return nil, errors.New("no releases found :(")
 	}
 
 	return res.Releases, nil
