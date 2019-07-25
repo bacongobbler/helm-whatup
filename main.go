@@ -44,8 +44,9 @@ type ChartVersionInfo struct {
 func main() {
 	cmd := &cobra.Command{
 		Use:   "whatup [flags]",
-		Short: fmt.Sprintf("check if installed charts are out of date (helm-whatup %s)", version),
+		Short: fmt.Sprintf("check if installed charts are out of date"),
 		RunE:  run,
+		Version: version,
 	}
 
 	cmd.Flags().StringVarP(&outputFormat, "output", "o", "table", "Output format, choose from plain, json, yaml, table")
