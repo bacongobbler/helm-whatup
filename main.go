@@ -62,7 +62,10 @@ func main() {
 }
 
 func run(cmd *cobra.Command, args []string) error {
-	client := newClient()
+	client, err := newClient()
+	if err != nil {
+		return err
+	}
 
 	releases, err := fetchReleases(client)
 	if err != nil {
@@ -104,7 +107,7 @@ func run(cmd *cobra.Command, args []string) error {
 }
 
 
-func newClient() *helm.Client {
+func newClient() (*helm.Client, error) {
 	/// === Pre-Checks ===
 	if settings.TillerHost == "" {
 		if os.Getenv("TILLER_HOST") != "" {
@@ -115,8 +118,7 @@ func newClient() *helm.Client {
 		}
 
 		if settings.TillerHost == "" {
-			fmt.Errorf("error: Tiller Host not set")
-			os.Exit(1)
+			return nil, fmt.Errorf("error: Tiller Host not set")
 		}
 	}
 
@@ -167,13 +169,13 @@ func newClient() *helm.Client {
 
 		if err != nil {
 			_, _ = fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			return nil, err
 		}
 
 		options = append(options, helm.WithTLS(tlscfg))
 	}
 
-	return helm.NewClient(options...)
+	return helm.NewClient(options...), nil
 }
 
 func formatOutput(result []ChartVersionInfo) error {
