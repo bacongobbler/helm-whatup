@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/jedib0t/go-pretty/table"
 
@@ -26,7 +27,9 @@ var devel bool
 var logDebug bool
 var version = "canary"
 
-var settings 		helmenv.EnvSettings
+var (
+	settings 		helmenv.EnvSettings
+)
 
 const (
 	statusOutdated = "OUTDATED"
@@ -185,21 +188,29 @@ func newClient() *helm.Client {
 	}
 
 	if settings.TLSCaCertFile == helmenv.DefaultTLSCaCert || settings.TLSCaCertFile == "" {
-		settings.TLSCaCertFile = settings.Home.TLSCaCert()
+		settings.TLSCaCertFile = fmt.Sprintf("%s/%s", os.ExpandEnv("$HELM_HOME"), settings.Home.TLSCaCert())
 	} else {
 		settings.TLSCaCertFile = os.ExpandEnv(settings.TLSCaCertFile)
 	}
 
 	if settings.TLSCertFile == helmenv.DefaultTLSCert || settings.TLSCertFile == "" {
-		settings.TLSCertFile = settings.Home.TLSCert()
+		settings.TLSCertFile = fmt.Sprintf("%s/%s", os.ExpandEnv("$HELM_HOME"), settings.Home.TLSCert())
 	} else {
 		settings.TLSCertFile = os.ExpandEnv(settings.TLSCertFile)
 	}
 
 	if settings.TLSKeyFile == helmenv.DefaultTLSKeyFile || settings.TLSKeyFile == "" {
-		settings.TLSKeyFile = settings.Home.TLSKey()
+		settings.TLSKeyFile = fmt.Sprintf("%s/%s", os.ExpandEnv("$HELM_HOME"), settings.Home.TLSKey())
 	} else {
 		settings.TLSKeyFile = os.ExpandEnv(settings.TLSKeyFile)
+	}
+
+	if os.Getenv("HELM_TLS_ENABLE") != "" {
+		settings.TLSEnable, _ = strconv.ParseBool(os.Getenv("HELM_TLS_ENABLE"))
+	}
+
+	if os.Getenv("HELM_TLS_VERIFY") != "" {
+		settings.TLSVerify, _ = strconv.ParseBool(os.Getenv("HELM_TLS_VERIFY"))
 	}
 
 	options := []helm.Option{ helm.Host(settings.TillerHost) }
