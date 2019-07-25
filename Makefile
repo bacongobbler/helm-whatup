@@ -5,6 +5,14 @@ VERSION := $(shell sed -n -e 's/version:[ "]*\([^"]*\).*/\1/p' plugin.yaml)
 DIST := $(CURDIR)/_dist
 LDFLAGS := "-X main.version=${VERSION}"
 
+.PHONY: test
+test: build
+	go test ./...
+
+.PHONY: cov
+cov: build
+	go test -coverprofile c.out ./...
+
 .PHONY: build
 build:
 	go build -o bin/helm-whatup -ldflags $(LDFLAGS) ./main.go
