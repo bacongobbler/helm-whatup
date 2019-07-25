@@ -93,50 +93,11 @@ func run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	switch outputFormat {
-	case "table":
-		_table := table.NewWriter()
-		_table.SetOutputMirror(os.Stdout)
-
-		_table.AppendHeader(table.Row{"Release Name", "Installed version", "Available version"})
-
-		for _, versionInfo := range result {
-			if versionInfo.LatestVersion != versionInfo.InstalledVersion {
-				_table.AppendRow(table.Row{versionInfo.ReleaseName, versionInfo.InstalledVersion, versionInfo.LatestVersion})
-			}
-		}
-
-		// print Table
-		_table.Render()
-
-	case "plain":
-		for _, versionInfo := range result {
-			if versionInfo.LatestVersion != versionInfo.InstalledVersion {
-				fmt.Printf("There is an update available for helm_release %s (%s)!\nInstalled version: %s\nAvailable version: %s\n", versionInfo.ReleaseName, versionInfo.ChartName, versionInfo.InstalledVersion, versionInfo.LatestVersion)
-			} else {
-				fmt.Printf("Release %s (%s) is up to date.\n", versionInfo.ReleaseName, versionInfo.LatestVersion)
-			}
-		}
-		fmt.Println("Done.")
-
-	case "json":
-		outputBytes, err := json.MarshalIndent(result, "", "    ")
-		if err != nil {
-			return err
-		}
-		fmt.Println(string(outputBytes))
-
-	case "yml":
-		fallthrough
-	case "yaml":
-		outputBytes, err := yaml.Marshal(result)
-		if err != nil {
-			return err
-		}
-		fmt.Println(string(outputBytes))
-
-	default:
-		return fmt.Errorf("invalid formatter: %s", outputFormat)
+	// output Informations
+	err = formatOutput(result)
+	if err != nil {
+		debug("There was an Error while formatting and printing the Results")
+		return err
 	}
 
 	return nil
@@ -215,6 +176,56 @@ func newClient() *helm.Client {
 	return helm.NewClient(options...)
 }
 
+func formatOutput(result []ChartVersionInfo) error {
+	switch outputFormat {
+	case "table":
+		_table := table.NewWriter()
+		_table.SetOutputMirror(os.Stdout)
+
+		_table.AppendHeader(table.Row{"Release Name", "Installed version", "Available version"})
+
+		for _, versionInfo := range result {
+			if versionInfo.LatestVersion != versionInfo.InstalledVersion {
+				_table.AppendRow(table.Row{versionInfo.ReleaseName, versionInfo.InstalledVersion, versionInfo.LatestVersion})
+			}
+		}
+
+		// print Table
+		_table.Render()
+
+	case "plain":
+		for _, versionInfo := range result {
+			if versionInfo.LatestVersion != versionInfo.InstalledVersion {
+				fmt.Printf("There is an update available for helm_release %s (%s)!\nInstalled version: %s\nAvailable version: %s\n", versionInfo.ReleaseName, versionInfo.ChartName, versionInfo.InstalledVersion, versionInfo.LatestVersion)
+			} else {
+				fmt.Printf("Release %s (%s) is up to date.\n", versionInfo.ReleaseName, versionInfo.LatestVersion)
+			}
+		}
+		fmt.Println("Done.")
+
+	case "json":
+		outputBytes, err := json.MarshalIndent(result, "", "    ")
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(outputBytes))
+
+	case "yml":
+		fallthrough
+	case "yaml":
+		outputBytes, err := yaml.Marshal(result)
+		if err != nil {
+			return err
+		}
+		fmt.Println(string(outputBytes))
+
+	default:
+		return fmt.Errorf("invalid formatter: %s", outputFormat)
+	}
+
+	return nil
+}
+
 func parseReleases(releases []*release.Release, repositories []*repo.IndexFile) ([]ChartVersionInfo, error) {
 	var result []ChartVersionInfo
 
@@ -228,6 +239,7 @@ func parseReleases(releases []*release.Release, repositories []*repo.IndexFile) 
 					constraint = ">= *-0"
 				}
 				chartVer, err := idx.Get(helmRelease.Chart.Metadata.Name, constraint)
+
 				if err != nil {
 					return nil, err
 				}
