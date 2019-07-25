@@ -11,6 +11,7 @@ env:
 
 before_script:
   - curl -L https://git.io/get_helm.sh | bash
+  - helm init --client-only
   - helm plugin install https://github.com/rimusz/helm-tiller
   - helm tiller start-ci
   - curl https://glide.sh/get | sh
