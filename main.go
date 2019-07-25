@@ -36,7 +36,7 @@ const (
 	statusUptodate = "UPTODATE"
 )
 
-// Struct containing all relevant Informations about Chart Releases in Tiller/ Helm
+// ChartVersionInfo contains all relevant Informations about Chart Releases in Tiller/ Helm
 type ChartVersionInfo struct {
 	ReleaseName      string `json:"releaseName"`		// Helm Release Name
 	ChartName        string `json:"chartName"`			// Chart Name of the Release
