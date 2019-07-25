@@ -28,7 +28,7 @@ var logDebug bool
 var version = "canary"
 
 var (
-	settings 		helmenv.EnvSettings
+	settings helmenv.EnvSettings
 )
 
 const (
@@ -38,11 +38,11 @@ const (
 
 // ChartVersionInfo contains all relevant Informations about Chart Releases in Tiller/ Helm
 type ChartVersionInfo struct {
-	ReleaseName      string `json:"releaseName"`		// Helm Release Name
-	ChartName        string `json:"chartName"`			// Chart Name of the Release
-	InstalledVersion string `json:"installedVersion"`	// Installed Chart Version
-	LatestVersion    string `json:"latestVersion"`		// Latest available Version of Chart
-	Status           string `json:"status"`				// Status of Release: Is Release UpToDate or Outdated
+	ReleaseName      string `json:"releaseName"`      // Helm Release Name
+	ChartName        string `json:"chartName"`        // Chart Name of the Release
+	InstalledVersion string `json:"installedVersion"` // Installed Chart Version
+	LatestVersion    string `json:"latestVersion"`    // Latest available Version of Chart
+	Status           string `json:"status"`           // Status of Release: Is Release UpToDate or Outdated
 }
 
 func main() {
@@ -106,7 +106,6 @@ func run(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-
 func newClient() (*helm.Client, error) {
 	/// === Pre-Checks ===
 	if settings.TillerHost == "" {
@@ -148,21 +147,21 @@ func newClient() (*helm.Client, error) {
 		settings.TLSVerify, _ = strconv.ParseBool(os.Getenv("HELM_TLS_VERIFY"))
 	}
 
-	options := []helm.Option{ helm.Host(settings.TillerHost) }
+	options := []helm.Option{helm.Host(settings.TillerHost)}
 
 	debug("Tiller Host: \"%s\", TLS Enabled: \"%t\", TLS Verify: \"%t\"",
-			settings.TillerHost, settings.TLSEnable, settings.TLSVerify)
+		settings.TillerHost, settings.TLSEnable, settings.TLSVerify)
 
 	// check if TLS is enabled
 	if settings.TLSEnable || settings.TLSVerify {
 		debug("Host=%q, Key=%q, Cert=%q, CA=%q\n", settings.TLSServerName, settings.TLSKeyFile, settings.TLSCertFile, settings.TLSCaCertFile)
 
 		tlsopts := tlsutil.Options{
-			ServerName:			settings.TillerHost,
-			CaCertFile:			settings.TLSCaCertFile,
-			CertFile:			settings.TLSCertFile,
-			KeyFile:			settings.TLSKeyFile,
-			InsecureSkipVerify:	!settings.TLSVerify,
+			ServerName:         settings.TillerHost,
+			CaCertFile:         settings.TLSCaCertFile,
+			CertFile:           settings.TLSCertFile,
+			KeyFile:            settings.TLSKeyFile,
+			InsecureSkipVerify: !settings.TLSVerify,
 		}
 
 		tlscfg, err := tlsutil.ClientConfig(tlsopts)
