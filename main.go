@@ -1,14 +1,13 @@
 package main
 
 import (
-	"errors"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
 
 	"github.com/jedib0t/go-pretty/table"
-
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
