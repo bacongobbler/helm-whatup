@@ -5,20 +5,20 @@ go:
 
 install: true
 
+env:
+  - HELM_HOST=127.0.0.1:44134
+  - TILLER_HOST=127.0.0.1:44134
+
 before_script:
   - curl -L https://git.io/get_helm.sh | bash
   - helm plugin install https://github.com/rimusz/helm-tiller
   - helm tiller start-ci
-  - source <(helm tiller env)
-  - export TILLER_HOST=${HELM_HOST}
   - curl https://glide.sh/get | sh
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
 
 script:
-  - source <(helm tiller env)
-  - export TILLER_HOST=${HELM_HOST}
   - make bootstrap
   - make build
   - go test -coverprofile c.out ./...
