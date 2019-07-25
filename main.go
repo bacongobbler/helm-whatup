@@ -23,6 +23,7 @@ Check to see if there is an updated version available for installed charts.
 
 var outputFormat string
 var devel bool
+var logDebug bool
 var version = "canary"
 
 var settings 		helmenv.EnvSettings
@@ -50,6 +51,7 @@ func main() {
 
 	cmd.Flags().StringVarP(&outputFormat, "output", "o", "table", "Output format, choose from plain, json, yaml, table")
 	cmd.Flags().BoolVarP(&devel, "devel", "d", false, "Whether to include pre-releases or not, defaults to false.")
+	cmd.Flags().BoolVarP(&logDebug, "deb", "D", false, "Print Debug Logs, defaults to false.")
 
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
@@ -257,4 +259,11 @@ func fetchIndices(client *helm.Client) ([]*repo.IndexFile, error) {
 	}
 
 	return indices, nil
+}
+
+func debug(format string, args ...interface{}) {
+	if logDebug {
+		format = fmt.Sprintf("[DEBUG] %s\n", format)
+		fmt.Printf(format, args...)
+	}
 }
