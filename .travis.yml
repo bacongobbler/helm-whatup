@@ -6,6 +6,7 @@ go:
 install: true
 
 before_script:
+  - curl -L https://git.io/get_helm.sh | bash
   - curl https://glide.sh/get | sh
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
