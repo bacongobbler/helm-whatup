@@ -1,5 +1,5 @@
-hash: 36e63e26f65d85b2bfe5de7a7b4aa58a26c742b08ac3d4fb99fe47a09531cbfc
-updated: 2019-07-25T01:03:49.57959346+02:00
+hash: b5a89be06b1109f9346352d72a74a4fc8f280eaaac24d4d208cc666508633e17
+updated: 2019-07-26T01:17:31.354161535+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7664702784775e51966f0885f5cd27435916517b
@@ -62,6 +62,10 @@ imports:
   version: f2b07da1e2c38d5f12845a4f607e2e1018cbb1f5
 - name: github.com/spf13/pflag
   version: 24fa6976df40757dce6aea913e7b81ade90530e1
+- name: github.com/tidwall/gjson
+  version: c5e72cdf74dff23857243dd662c465b810891c21
+- name: github.com/tidwall/sjson
+  version: 25fb082a20e29e83fb7b7ef5f5919166aad1f084
 - name: go.mongodb.org/mongo-driver
   version: 58da8e604dddd89f6c03a5ecf3cb406e646685df
   subpackages:
@@ -186,4 +190,8 @@ imports:
   - pkg/tlsutil
   - pkg/urlutil
   - pkg/version
-testImports: []
+testImports:
+- name: github.com/tidwall/match
+  version: 33827db735fff6510490d69a8622612558a557ed
+- name: github.com/tidwall/pretty
+  version: 1166b9ac2b65e46a43d8618d30d1554f4652d49b

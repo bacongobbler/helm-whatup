@@ -28,3 +28,7 @@ import:
   version: 4.2.1
   subpackages:
   - table
+- package: github.com/tidwall/sjson
+  version: v1.0.4
+- package: github.com/tidwall/gjson
+  version: v1.3.2
