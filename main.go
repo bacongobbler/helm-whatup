@@ -215,8 +215,13 @@ func newClient() *helm.Client {
 
 	options := []helm.Option{ helm.Host(settings.TillerHost) }
 
+	debug("Tiller Host: \"%s\", TLS Enabled: \"%t\", TLS Verify: \"%t\"",
+			settings.TillerHost, settings.TLSEnable, settings.TLSVerify)
+
 	// check if TLS is enabled
 	if settings.TLSEnable || settings.TLSVerify {
+		debug("Host=%q, Key=%q, Cert=%q, CA=%q\n", settings.TLSServerName, settings.TLSKeyFile, settings.TLSCertFile, settings.TLSCaCertFile)
+
 		tlsopts := tlsutil.Options{
 			ServerName:			settings.TillerHost,
 			CaCertFile:			settings.TLSCaCertFile,
