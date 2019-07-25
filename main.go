@@ -204,7 +204,7 @@ func formatOutput(result []ChartVersionInfo) error {
 		fmt.Println(string(outputBytes))
 
 	default:
-		return fmt.Errorf("invalid formatter: %s", outputFormat)
+		return fmt.Errorf("invalid output formatter: '%s'", outputFormat)
 	}
 
 	return nil
