@@ -88,37 +88,9 @@ func run(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	var result []ChartVersionInfo
-
-	for _, helmRelease := range releases {
-		for _, idx := range repositories {
-			if idx.Has(helmRelease.Chart.Metadata.Name, helmRelease.Chart.Metadata.Version) {
-				// fetch latest helm_release
-				constraint := ""
-				// Include pre-releases
-				if devel {
-					constraint = ">= *-0"
-				}
-				chartVer, err := idx.Get(helmRelease.Chart.Metadata.Name, constraint)
-				if err != nil {
-					return err
-				}
-
-				versionStatus := ChartVersionInfo{
-					ReleaseName:      helmRelease.Name,
-					ChartName:        helmRelease.Chart.Metadata.Name,
-					InstalledVersion: helmRelease.Chart.Metadata.Version,
-					LatestVersion:    chartVer.Version,
-				}
-
-				if versionStatus.InstalledVersion == versionStatus.LatestVersion {
-					versionStatus.Status = statusUptodate
-				} else {
-					versionStatus.Status = statusOutdated
-				}
-				result = append(result, versionStatus)
-			}
-		}
+	result, err := parseReleases(releases, repositories)
+	if err != nil {
+		return err
 	}
 
 	switch outputFormat {
@@ -241,6 +213,43 @@ func newClient() *helm.Client {
 	}
 
 	return helm.NewClient(options...)
+}
+
+func parseReleases(releases []*release.Release, repositories []*repo.IndexFile) ([]ChartVersionInfo, error) {
+	var result []ChartVersionInfo
+
+	for _, helmRelease := range releases {
+		for _, idx := range repositories {
+			if idx.Has(helmRelease.Chart.Metadata.Name, helmRelease.Chart.Metadata.Version) {
+				// fetch latest helm_release
+				constraint := ""
+				// Include pre-releases
+				if devel {
+					constraint = ">= *-0"
+				}
+				chartVer, err := idx.Get(helmRelease.Chart.Metadata.Name, constraint)
+				if err != nil {
+					return nil, err
+				}
+
+				versionStatus := ChartVersionInfo{
+					ReleaseName:      helmRelease.Name,
+					ChartName:        helmRelease.Chart.Metadata.Name,
+					InstalledVersion: helmRelease.Chart.Metadata.Version,
+					LatestVersion:    chartVer.Version,
+				}
+
+				if versionStatus.InstalledVersion == versionStatus.LatestVersion {
+					versionStatus.Status = statusUptodate
+				} else {
+					versionStatus.Status = statusOutdated
+				}
+				result = append(result, versionStatus)
+			}
+		}
+	}
+
+	return result, nil
 }
 
 func fetchReleases(client *helm.Client) ([]*release.Release, error) {
