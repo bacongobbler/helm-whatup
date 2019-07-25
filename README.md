@@ -6,6 +6,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/fabmation-gmbh/helm-whatup)](https://goreportcard.com/report/github.com/fabmation-gmbh/helm-whatup)
 [![Build Status](https://travis-ci.org/fabmation-gmbh/helm-whatup.svg?branch=master)](https://travis-ci.org/fabmation-gmbh/helm-whatup)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/a6cb2c603e46476fbc68dcfc767d10ea)](https://www.codacy.com/app/benniciemanuel78/helm-whatup?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=fabmation-gmbh/helm-whatup&amp;utm_campaign=Badge_Grade)
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/3007/badge)](https://bestpractices.coreinfrastructure.org/projects/3007)
 
 
 This Repo is a fork of [bacongobbler/helm-whatup][], because the original project is no longer actively further developed.
