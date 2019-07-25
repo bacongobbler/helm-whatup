@@ -18,10 +18,6 @@ import (
 	"k8s.io/helm/pkg/tlsutil"
 )
 
-const globalUsage = `
-Check to see if there is an updated version available for installed charts.
-`
-
 var outputFormat string
 var devel bool
 var logDebug bool
