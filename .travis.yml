@@ -8,6 +8,8 @@ install: true
 env:
   - HELM_HOST=127.0.0.1:44134
   - TILLER_HOST=127.0.0.1:44134
+  - HELM_HOME=${HOME}/.helm
+  - HELM_PATH_REPOSITORY_FILE=${HELM_HOME}/repository/repositories.yaml
 
 before_script:
   - curl -L https://git.io/get_helm.sh | bash
