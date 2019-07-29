@@ -5,7 +5,7 @@ import:
 - package: gopkg.in/yaml.v2
   version: ^2.2.2
 - package: golang.org/x/sys
-  version: d8e400bc7db4870d786864138af681469693d18c
+  version: b90733256f2e882e81d52f9126de08df5615afd9
   subpackages:
   - unix
   - windows
