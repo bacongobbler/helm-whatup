@@ -137,6 +137,7 @@ func newClient() (*helm.Client, error) {
 
 	debug("Tiller Host: \"%s\", TLS Enabled: \"%t\", TLS Verify: \"%t\"",
 		settings.TillerHost, settings.TLSEnable, settings.TLSVerify)
+	debug("Helm Home: \"%s\"", settings.Home)
 
 	// check if TLS is enabled
 	if settings.TLSEnable || settings.TLSVerify {
