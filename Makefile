@@ -26,7 +26,7 @@ test: build
 
 .PHONY: cov
 cov: build
-	go test -coverprofile c.out ./...
+	courtney -o c.out .
 
 .PHONY: build
 build:
@@ -44,3 +44,4 @@ dist:
 .PHONY: bootstrap
 bootstrap:
 	glide install
+	go get -u github.com/dave/courtney

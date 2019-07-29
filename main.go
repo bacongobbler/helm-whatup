@@ -101,7 +101,7 @@ func newClient() (*helm.Client, error) {
 			settings.TillerHost = os.Getenv("HELM_HOST")
 		}
 
-		if settings.TillerHost == "" {
+		if settings.TillerHost == "" { // notest
 			return nil, fmt.Errorf("error: Tiller Host not set")
 		}
 	}
@@ -189,7 +189,7 @@ func formatOutput(result []ChartVersionInfo) ([]byte, error) {
 			if versionInfo.LatestVersion != versionInfo.InstalledVersion {
 				fmt.Printf("There is an update available for helm_release %s (%s)!\nInstalled version: %s\nAvailable version: %s\n", versionInfo.ReleaseName, versionInfo.ChartName, versionInfo.InstalledVersion, versionInfo.LatestVersion)
 			} else {
-				fmt.Printf("Release %s (%s) is up to date.\n", versionInfo.ReleaseName, versionInfo.LatestVersion)
+				fmt.Printf("Release %s (%s) is up to date.\n", versionInfo.ReleaseName, versionInfo.LatestVersion) // notest
 			}
 		}
 		fmt.Println("Done.")
@@ -219,7 +219,7 @@ func formatOutput(result []ChartVersionInfo) ([]byte, error) {
 		fmt.Println(string(outputBytes))
 
 	default:
-		return nil, fmt.Errorf("invalid output formatter: '%s'", outputFormat)
+		return nil, fmt.Errorf("invalid output formatter: '%s'", outputFormat) // notest
 	}
 
 	return nil, nil
@@ -235,7 +235,7 @@ func parseReleases(releases []*release.Release, repositories []*repo.IndexFile) 
 				constraint := ""
 				// Include pre-releases
 				if devel {
-					constraint = ">= *-0"
+					constraint = ">= *-0" // notest
 				}
 				chartVer, err := idx.Get(helmRelease.Chart.Metadata.Name, constraint)
 
@@ -250,7 +250,7 @@ func parseReleases(releases []*release.Release, repositories []*repo.IndexFile) 
 					LatestVersion:    chartVer.Version,
 				}
 
-				if versionStatus.InstalledVersion == versionStatus.LatestVersion {
+				if versionStatus.InstalledVersion == versionStatus.LatestVersion { // notest
 					versionStatus.Status = statusUptodate
 				} else {
 					versionStatus.Status = statusOutdated
@@ -270,7 +270,7 @@ func fetchReleases(client *helm.Client) ([]*release.Release, error) {
 		return nil, err
 	}
 
-	if res == nil {
+	if res == nil { // notest
 		return nil, errors.New("no releases found :(")
 	}
 
@@ -280,7 +280,7 @@ func fetchReleases(client *helm.Client) ([]*release.Release, error) {
 func fetchIndices(client *helm.Client) ([]*repo.IndexFile, error) {
 	indices := []*repo.IndexFile{}
 	rfp := os.Getenv("HELM_PATH_REPOSITORY_FILE")
-	if rfp == "" {
+	if rfp == "" { // notest
 		rfp = fmt.Sprintf("%s/repository/repositories.yaml", os.ExpandEnv("$HELM_HOME"))
 
 		// check if File exists
@@ -291,14 +291,14 @@ func fetchIndices(client *helm.Client) ([]*repo.IndexFile, error) {
 
 	repofile, err := repo.LoadRepositoriesFile(rfp)
 	if err != nil {
-		if err == repo.ErrRepoOutOfDate {
+		if err == repo.ErrRepoOutOfDate { // notest
 			return nil, fmt.Errorf("helm repo is out of date! please update with 'helm repo update'")
 		} else {
 			return nil, fmt.Errorf("could not load repositories file '%s': %s", rfp, err)
 		}
 	}
 
-	if len(repofile.Repositories) == 0 {
+	if len(repofile.Repositories) == 0 { // notest
 		return nil, errors.New("no repositories found. run `helm repo update` and re-try")
 	}
 
