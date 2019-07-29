@@ -3,6 +3,7 @@ _dist/
 vendor/
 ### Local Development
 *.pem
+*.srl
 
 ### Go template
 # Binaries for programs and plugins
