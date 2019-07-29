@@ -166,6 +166,8 @@ func newClient() (*helm.Client, error) {
 func formatOutput(result []ChartVersionInfo) ([]byte, error) {
 	switch outputFormat {
 	case "table":
+		debug("formatOuput: outputFormat: 'table'")
+
 		_table := table.NewWriter()
 		_table.SetOutputMirror(os.Stdout)
 
@@ -181,6 +183,8 @@ func formatOutput(result []ChartVersionInfo) ([]byte, error) {
 		_table.Render()
 
 	case "plain":
+		debug("formatOuput: outputFormat: 'plain'")
+
 		for _, versionInfo := range result {
 			if versionInfo.LatestVersion != versionInfo.InstalledVersion {
 				fmt.Printf("There is an update available for helm_release %s (%s)!\nInstalled version: %s\nAvailable version: %s\n", versionInfo.ReleaseName, versionInfo.ChartName, versionInfo.InstalledVersion, versionInfo.LatestVersion)
@@ -191,6 +195,8 @@ func formatOutput(result []ChartVersionInfo) ([]byte, error) {
 		fmt.Println("Done.")
 
 	case "json":
+		debug("formatOuput: outputFormat: 'json'")
+
 		outputBytes, err := json.MarshalIndent(result, "", "    ")
 		if err != nil {
 			return nil, err
@@ -204,6 +210,8 @@ func formatOutput(result []ChartVersionInfo) ([]byte, error) {
 	case "yml":
 		fallthrough
 	case "yaml":
+		debug("formatOuput: outputFormat: 'yaml'")
+
 		outputBytes, err := yaml.Marshal(result)
 		if err != nil {
 			return nil, err
