@@ -4,7 +4,7 @@ HAS_GLIDE := $(shell command -v glide;)
 VERSION := $(shell sed -n -e 's/version:[ "]*\([^"]*\).*/\1/p' plugin.yaml)
 DIST := $(CURDIR)/_dist
 LDFLAGS := "-X main.version=${VERSION}"
-HELM_FLAG := "--host 127.0.0.1:44134"
+HELM_FLAG := --host 127.0.0.1:44134
 
 .PHONY: helmrel
 helmrel:
