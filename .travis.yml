@@ -27,7 +27,7 @@ before_script:
   # Install Helm
   - curl -L https://git.io/get_helm.sh | bash
   - helm init
-  - helm repo add stable https://kubernetes-charts.storage.googleapis.com
+  - sudo apt-get install -y socat
   - curl https://glide.sh/get | sh
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
