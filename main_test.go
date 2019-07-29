@@ -132,7 +132,6 @@ func TestCharts(t *testing.T) {
 		"yml",
 		"yaml",
 	}
-
 	formatOutputReturn = false
 	for _, format := range outputFormats {
 		outputFormat = format
@@ -169,9 +168,7 @@ func TestMain(t *testing.T) {
 	main()
 }
 
-
 /// >>>>> Needed Functions <<<<<
-
 
 // Source: https://gist.github.com/turtlemonvh/e4f7404e28387fadb8ad275a99596f67#file-equal_json-go-L11
 func equalJSON(s1, s2 string) (bool, error) {

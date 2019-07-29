@@ -60,6 +60,8 @@ script:
   - export TILLER_HOST=$(minikube service --url --format "{{.IP}}:{{.Port}}" --namespace=kube-system tiller-external | head -n1)
   - helm repo update
   - make bootstrap build helmrel cov
+  # run Additionally/ External Coverage/ Unit Tests
+  - ./.dev/test_cli.sh
 
 after_script:
   - cat ${HOME}/.helm/plugins/helm-tiller/logs/*

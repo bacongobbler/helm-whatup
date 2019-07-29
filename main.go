@@ -23,7 +23,7 @@ import (
 var outputFormat string
 var devel bool
 var logDebug bool
-var formatOutputReturn bool	// Return the formatted Output
+var formatOutputReturn bool // Return the formatted Output
 var version = "canary"
 
 var (
@@ -97,7 +97,6 @@ func newClient() (*helm.Client, error) {
 	if settings.TillerHost == "" {
 		if os.Getenv("TILLER_HOST") != "" {
 			settings.TillerHost = os.Getenv("TILLER_HOST")
-
 		} else if os.Getenv("HELM_HOST") != "" {
 			settings.TillerHost = os.Getenv("HELM_HOST")
 		}
