@@ -1,4 +1,31 @@
 language: go
+sudo: required
+env:
+  global:
+    - CHANGE_MINIKUBE_NONE_USER=true
+    - MINIKUBE_WANTUPDATENOTIFICATION=false
+    - MINIKUBE_WANTREPORTERRORPROMPT=false
+    - MINIKUBE_HOME=$HOME
+    - CHANGE_MINIKUBE_NONE_USER=true
+    - KUBECONFIG=$HOME/.kube/config
+
+cache:
+  directories:
+    - $HOME/.cache/go-build
+    - $HOME/.glide
+    - $HOME/.minikube/cache
+    - $HOME/.helm/cache
+    - $HOME/docker
+
+before_cache:
+  # Save tagged docker images
+  - >
+    mkdir -p $HOME/docker && docker images -a --filter='dangling=false' --format '{{.Repository}}:{{.Tag}} {{.ID}}'
+    | xargs -n 2 -t sh -c 'test -e $HOME/docker/$1.tar.gz || docker save $0 | gzip -2 > $HOME/docker/$1.tar.gz'
+
+before_install:
+  # Load cached docker images
+  - if [[ -d $HOME/docker ]]; then ls $HOME/docker/*.tar.gz | xargs -I {file} sh -c "zcat {file} | docker load"; fi
 
 go:
   - 1.12.x
@@ -6,15 +33,32 @@ go:
 install: true
 
 before_script:
+  # Download kubectl, which is a requirement for using minikube.
+  - curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.15.0/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+  # Download minikube.
+  - curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.2.0/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+  - mkdir -p $HOME/.kube $HOME/.minikube
+  - touch $KUBECONFIG
+  - sudo minikube start --vm-driver=none --kubernetes-version=v1.15.0
+  - "sudo chown -R travis: /home/travis/.minikube/"
+  # Install Helm
+  - curl -L https://git.io/get_helm.sh | bash
+  - helm init
+  - sudo apt-get install -y socat
   - curl https://glide.sh/get | sh
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
 
 script:
-  - make bootstrap
-  - make build
-  - go test -coverprofile c.out ./...
+  - kubectl --namespace kube-system expose deployment tiller-deploy --type=NodePort --name=tiller-external
+  - kubectl --namespace kube-system get svc tiller-external
+  - minikube service --url --format "{{.IP}}:{{.Port}}" --namespace=kube-system tiller-external | head -n1
+  - export HELM_HOST=$(minikube service --url --format "{{.IP}}:{{.Port}}" --namespace=kube-system tiller-external | head -n1)
+  - export TILLER_HOST=$(minikube service --url --format "{{.IP}}:{{.Port}}" --namespace=kube-system tiller-external | head -n1)
+  - make bootstrap build helmrel cov
 
 after_script:
+  - cat ${HOME}/.helm/plugins/helm-tiller/logs/*
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+  - helm tiller stop

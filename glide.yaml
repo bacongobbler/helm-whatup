@@ -5,8 +5,10 @@ import:
 - package: gopkg.in/yaml.v2
   version: ^2.2.2
 - package: golang.org/x/sys
+  version: b90733256f2e882e81d52f9126de08df5615afd9
   subpackages:
   - unix
+  - windows
 - package: k8s.io/cloud-provider
   version: kubernetes-1.14.1
 - package: k8s.io/client-go
@@ -28,3 +30,7 @@ import:
   version: 4.2.1
   subpackages:
   - table
+- package: github.com/tidwall/sjson
+  version: v1.0.4
+- package: github.com/tidwall/gjson
+  version: v1.3.2
