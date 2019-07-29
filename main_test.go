@@ -125,7 +125,24 @@ func TestCharts(t *testing.T) {
 	formatOutputReturn = true
 	output, err := formatOutput(result)
 	if err != nil {
-		t.Errorf("Excpected to get nothing but got an Error instead: %s", err.Error())
+		t.Errorf("Excpected to get JSON Output but got an Error instead: %s", err.Error())
+	}
+
+	outputFormats := []string{
+		"table",
+		"plain",
+		"yml",
+		"yaml",
+	}
+
+	formatOutputReturn = false
+	for _, format := range outputFormats {
+		outputFormat = format
+		_, err = formatOutput(result)
+
+		if err != nil {
+			t.Errorf("Excpected to get %s Output but got an Error instead: %s", format, err.Error())
+		}
 	}
 
 	// remove [].{}.latestVersion
