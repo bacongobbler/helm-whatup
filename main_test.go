@@ -167,6 +167,7 @@ func equalJSON(s1, s2 string) (bool, error) {
 
 	err = json.Unmarshal([]byte(s2), &o2)
 	if err != nil {
+		debug("s2 String: %s", s2)
 		return false, fmt.Errorf("error mashalling string 2 :: %s", err.Error())
 	}
 
