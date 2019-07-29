@@ -11,17 +11,16 @@ before_script:
   - export HELM_HOME=${HOME}/.helm
   - export HELM_PATH_REPOSITORY_FILE=${HELM_HOME}/repository/repositories.yaml
   - curl -L https://git.io/get_helm.sh | bash
-  - helm init
+  - helm init --client-only
   - helm plugin install https://github.com/rimusz/helm-tiller
-  - helm tiller start-ci
   - helm repo add stable https://kubernetes-charts.storage.googleapis.com
-  - helm repo list
   - curl https://glide.sh/get | sh
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
 
 script:
+  - helm tiller start-ci
   - make bootstrap build helmrel cov
 
 after_script:
