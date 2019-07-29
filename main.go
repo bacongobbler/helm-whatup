@@ -23,6 +23,7 @@ import (
 var outputFormat string
 var devel bool
 var logDebug bool
+var formatOutputReturn bool	// Return the formatted Output
 var version = "canary"
 
 var (
@@ -82,7 +83,7 @@ func run(cmd *cobra.Command, args []string) error {
 	}
 
 	// output Informations
-	err = formatOutput(result)
+	_, err = formatOutput(result)
 	if err != nil {
 		debug("There was an Error while formatting and printing the Results")
 		return err
@@ -162,7 +163,7 @@ func newClient() (*helm.Client, error) {
 	return helm.NewClient(options...), nil
 }
 
-func formatOutput(result []ChartVersionInfo) error {
+func formatOutput(result []ChartVersionInfo) ([]byte, error) {
 	switch outputFormat {
 	case "table":
 		_table := table.NewWriter()
@@ -192,24 +193,28 @@ func formatOutput(result []ChartVersionInfo) error {
 	case "json":
 		outputBytes, err := json.MarshalIndent(result, "", "    ")
 		if err != nil {
-			return err
+			return nil, err
 		}
 		fmt.Println(string(outputBytes))
+
+		if formatOutputReturn {
+			return outputBytes, nil
+		}
 
 	case "yml":
 		fallthrough
 	case "yaml":
 		outputBytes, err := yaml.Marshal(result)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		fmt.Println(string(outputBytes))
 
 	default:
-		return fmt.Errorf("invalid output formatter: '%s'", outputFormat)
+		return nil, fmt.Errorf("invalid output formatter: '%s'", outputFormat)
 	}
 
-	return nil
+	return nil, nil
 }
 
 func parseReleases(releases []*release.Release, repositories []*repo.IndexFile) ([]ChartVersionInfo, error) {
