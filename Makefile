@@ -18,7 +18,7 @@ helmrel:
 	helm install -n kuberhealthy --version 1.1.1 stable/kuberhealthy
 	helm install -n lamp --version 0.1.2 stable/lamp
 	helm install -n luigi --version 2.7.2 stable/luigi
-	helm install -n magento --version 0.4.10 stable/magento
+	helm --debug install -n magento --version 0.4.10 stable/magento
 
 .PHONY: test
 test: build
