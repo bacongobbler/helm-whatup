@@ -123,6 +123,7 @@ func TestCharts(t *testing.T) {
 
 	outputFormat = "json"
 	formatOutputReturn = true
+	logDebug = true // Enable Debug Output
 	output, err := formatOutput(result)
 	if err != nil {
 		t.Errorf("Excpected to get JSON Output but got an Error instead: %s", err.Error())
@@ -165,6 +166,10 @@ func TestCharts(t *testing.T) {
 	if !outputEqual {
 		t.Errorf("Expected Output is equal with expectation but got 'false'!")
 	}
+}
+
+func TestMain(t *testing.T) {
+	main()
 }
 
 
