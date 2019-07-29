@@ -40,6 +40,10 @@ before_script:
   - ./cc-test-reporter before-build
 
 script:
+  - kubectl --namespace kube-system expose deployment tiller-deploy --type=NodePort --name=tiller-external
+  - kubectl --namespace kube-system get svc tiller-external
+  - export HELM_HOST=$(minikube service tiller-external --url --format "{{.IP}}:{{.Port}}")
+  - export TILLER_HOST=$(minikube service tiller-external --url --format "{{.IP}}:{{.Port}}")
   - make bootstrap build helmrel cov
 
 after_script:
