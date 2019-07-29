@@ -16,7 +16,7 @@ before_script:
   - helm init --client-only
   - helm plugin install https://github.com/rimusz/helm-tiller
   - helm tiller start-ci
-  - source <(helm tiller env)
+  - helm repo add stable https://kubernetes-charts.storage.googleapis.com
   - curl https://glide.sh/get | sh
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
