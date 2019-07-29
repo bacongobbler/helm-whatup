@@ -14,7 +14,10 @@ cache:
     - $HOME/.glide
     - $HOME/.minikube/cache
     - $HOME/.helm/cache
-    - docker
+    - /var/lib/docker
+
+before_cache:
+  - rm -rf /var/lib/docker/{builder,buildkit,containers,network,plugins,swarm,trust,volumes,tmp}
 
 go:
   - 1.12.x
