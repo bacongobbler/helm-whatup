@@ -30,74 +30,74 @@ func TestClient(t *testing.T) {
 
 func TestCharts(t *testing.T) {
 	// 10 released/ installed Charts
-//	var expectedResults = []byte(`[
-//	{
-//		"releaseName": "coredns",
-//		"chartName": "coredns",
-//		"installedVersion": "1.5.0",
-//		"status": "OUTDATED"
-//	},
-//	{
-//		"releaseName": "hunter",
-//		"chartName": "karma",
-//		"installedVersion": "1.1.5",
-//		"status": "OUTDATED"
-//	},
-//	{
-//		"releaseName": "jenkins",
-//		"chartName": "jenkins",
-//		"installedVersion": "0.32.1",
-//		"status": "OUTDATED"
-//	},
-//	{
-//		"releaseName": "kafka-manager",
-//		"chartName": "kafka-manager",
-//		"installedVersion": "1.1.1",
-//		"status": "OUTDATED"
-//	},
-//	{
-//		"releaseName": "kapacitor",
-//		"chartName": "kapacitor",
-//		"installedVersion": "0.3.0",
-//		"status": "OUTDATED"
-//	},
-//	{
-//		"releaseName": "kube-hunter",
-//		"chartName": "kube-hunter",
-//		"installedVersion": "1.0.0",
-//		"status": "OUTDATED"
-//	},
-//	{
-//		"releaseName": "kube-slack",
-//		"chartName": "kube-slack",
-//		"installedVersion": "0.1.0",
-//		"status": "OUTDATED"
-//	},
-//	{
-//		"releaseName": "kuberhealthy",
-//		"chartName": "kuberhealthy",
-//		"installedVersion": "1.1.1",
-//		"status": "OUTDATED"
-//	},
-//	{
-//		"releaseName": "lamp",
-//		"chartName": "lamp",
-//		"installedVersion": "0.1.2",
-//		"status": "OUTDATED"
-//	},
-//	{
-//		"releaseName": "luigi",
-//		"chartName": "luigi",
-//		"installedVersion": "2.7.2",
-//		"status": "OUTDATED"
-//	},
-//	{
-//		"releaseName": "magento",
-//		"chartName": "magento",
-//		"installedVersion": "0.4.10",
-//		"status": "OUTDATED"
-//	}
-//]`)
+	var expectedResults = []byte(`[
+	{
+		"releaseName": "coredns",
+		"chartName": "coredns",
+		"installedVersion": "1.5.0",
+		"status": "OUTDATED"
+	},
+	{
+		"releaseName": "hunter",
+		"chartName": "karma",
+		"installedVersion": "1.1.5",
+		"status": "OUTDATED"
+	},
+	{
+		"releaseName": "jenkins",
+		"chartName": "jenkins",
+		"installedVersion": "0.32.1",
+		"status": "OUTDATED"
+	},
+	{
+		"releaseName": "kafka-manager",
+		"chartName": "kafka-manager",
+		"installedVersion": "1.1.1",
+		"status": "OUTDATED"
+	},
+	{
+		"releaseName": "kapacitor",
+		"chartName": "kapacitor",
+		"installedVersion": "0.3.0",
+		"status": "OUTDATED"
+	},
+	{
+		"releaseName": "kube-hunter",
+		"chartName": "kube-hunter",
+		"installedVersion": "1.0.0",
+		"status": "OUTDATED"
+	},
+	{
+		"releaseName": "kube-slack",
+		"chartName": "kube-slack",
+		"installedVersion": "0.1.0",
+		"status": "OUTDATED"
+	},
+	{
+		"releaseName": "kuberhealthy",
+		"chartName": "kuberhealthy",
+		"installedVersion": "1.1.1",
+		"status": "OUTDATED"
+	},
+	{
+		"releaseName": "lamp",
+		"chartName": "lamp",
+		"installedVersion": "0.1.2",
+		"status": "OUTDATED"
+	},
+	{
+		"releaseName": "luigi",
+		"chartName": "luigi",
+		"installedVersion": "2.7.2",
+		"status": "OUTDATED"
+	},
+	{
+		"releaseName": "magento",
+		"chartName": "magento",
+		"installedVersion": "0.4.10",
+		"status": "OUTDATED"
+	}
+	]`)
 
 	client, err := newClient()
 
@@ -141,14 +141,36 @@ func TestCharts(t *testing.T) {
 
 	// compare JSON Strings
 	// TODO: Compare Objects
-	//outputEqual, err := equalJSON(string(expectedResults), string(newJSON))
-	//if err != nil {
-	//	t.Errorf("[FATAL] Internal Error while comparing Output and expectation: %s", err.Error())
-	//}
-//
-//	if !outputEqual {
-//		t.Errorf("Expected Output is equal with expectation but got 'false'!")
-//	}
+	outputEqual, err := equalJSON(string(expectedResults), string(newJSON))
+	if err != nil {
+		t.Errorf("[FATAL] Internal Error while comparing Output and expectation: %s", err.Error())
+	}
+
+	if !outputEqual {
+		t.Errorf("Expected Output is equal with expectation but got 'false'!")
+	}
+}
+
+
+/// >>>>> Needed Functions <<<<<
+
+// Source: https://gist.github.com/turtlemonvh/e4f7404e28387fadb8ad275a99596f67#file-equal_json-go-L11
+func equalJSON(s1, s2 string) (bool, error) {
+	var o1 interface{}
+	var o2 interface{}
+
+	var err error
+	err = json.Unmarshal([]byte(s1), &o1)
+	if err != nil {
+		return false, fmt.Errorf("error mashalling string 1 :: %s", err.Error())
+	}
+
+	err = json.Unmarshal([]byte(s2), &o2)
+	if err != nil {
+		return false, fmt.Errorf("error mashalling string 2 :: %s", err.Error())
+	}
+
+	return reflect.DeepEqual(o1, o2), nil
 }
 
 func captureOutput(f func()) string {
