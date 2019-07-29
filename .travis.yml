@@ -17,13 +17,14 @@ before_script:
   - helm plugin install https://github.com/rimusz/helm-tiller
   - helm tiller start-ci
   - helm repo add stable https://kubernetes-charts.storage.googleapis.com
+  - helm repo list
   - curl https://glide.sh/get | sh
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
 
 script:
-  - source <(helm tiller env)
+  - helm repo list
   - make bootstrap build helmrel cov
 
 after_script:
