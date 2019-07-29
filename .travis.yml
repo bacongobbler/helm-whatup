@@ -1,4 +1,14 @@
 language: go
+sudo: required
+env:
+  global:
+    - CHANGE_MINIKUBE_NONE_USER=true
+    - MINIKUBE_WANTUPDATENOTIFICATION=false
+    - MINIKUBE_WANTREPORTERRORPROMPT=false
+    - MINIKUBE_HOME=$HOME
+    - CHANGE_MINIKUBE_NONE_USER=true
+    - KUBECONFIG=$HOME/.kube/config
+
 
 go:
   - 1.12.x
@@ -6,13 +16,17 @@ go:
 install: true
 
 before_script:
-  - export HELM_HOST=localhost:8080
-  - export TILLER_HOST=localhost:8080
-  - export HELM_HOME=${HOME}/.helm
-  - export HELM_PATH_REPOSITORY_FILE=${HELM_HOME}/repository/repositories.yaml
+  # Download kubectl, which is a requirement for using minikube.
+  - curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/v1.15.0/bin/linux/amd64/kubectl && chmod +x kubectl && sudo mv kubectl /usr/local/bin/
+  # Download minikube.
+  - curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.2.0/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+  - mkdir -p $HOME/.kube $HOME/.minikube
+  - touch $KUBECONFIG
+  - sudo minikube start --vm-driver=none --kubernetes-version=v1.15.0
+  - "sudo chown -R travis: /home/travis/.minikube/"
+  # Install Helm
   - curl -L https://git.io/get_helm.sh | bash
-  - helm init --client-only
-  - helm plugin install https://github.com/rimusz/helm-tiller
+  - helm init
   - helm repo add stable https://kubernetes-charts.storage.googleapis.com
   - curl https://glide.sh/get | sh
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
@@ -20,12 +34,7 @@ before_script:
   - ./cc-test-reporter before-build
 
 script:
-  - export HELM_TILLER_PORT=8080
-  - export CREATE_NAMESPACE_IF_MISSING=true
-  - export HELM_TILLER_SILENT=false
-  - helm tiller start-ci
   - make bootstrap build helmrel cov
-
 
 after_script:
   - cat ${HOME}/.helm/plugins/helm-tiller/logs/*
