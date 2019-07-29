@@ -283,8 +283,13 @@ func fetchIndices(client *helm.Client) ([]*repo.IndexFile, error) {
 	rfp := os.Getenv("HELM_PATH_REPOSITORY_FILE")
 	repofile, err := repo.LoadRepositoriesFile(rfp)
 
+	repofile, err := repo.LoadRepositoriesFile(rfp)
 	if err != nil {
-		return nil, fmt.Errorf("could not load repositories file '%s': %s", rfp, err)
+		if err == repo.ErrRepoOutOfDate {
+			return nil, fmt.Errorf("helm repo is out of date! please update with 'helm repo update'")
+		} else {
+			return nil, fmt.Errorf("could not load repositories file '%s': %s", rfp, err)
+		}
 	}
 
 	if len(repofile.Repositories) == 0 {
