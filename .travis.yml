@@ -9,6 +9,7 @@ env:
     - CHANGE_MINIKUBE_NONE_USER=true
     - KUBECONFIG=$HOME/.kube/config
     - HELM_HOME=$HOME/.helm
+    - HELM_PATH_REPOSITORY_FILE=$HELM_HOME/repository/repositories.yaml
 
 cache:
   directories:
