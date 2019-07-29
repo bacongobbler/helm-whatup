@@ -1,9 +1,14 @@
+// Copyright (c) 2019 FABMation GmbH
+// All Rights Reserved
 package main
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"log"
 	"os"
+	"reflect"
 	"strconv"
 	"testing"
 
