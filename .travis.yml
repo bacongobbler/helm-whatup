@@ -53,9 +53,9 @@ before_script:
 script:
   - kubectl --namespace kube-system expose deployment tiller-deploy --type=NodePort --name=tiller-external
   - kubectl --namespace kube-system get svc tiller-external
-  - minikube service --url --format "{{.IP}}:{{.Port}}" --namespace=kube-system tiller-external
-  - export HELM_HOST=$(minikube service --url --format "{{.IP}}:{{.Port}}" --namespace=kube-system tiller-external )
-  - export TILLER_HOST=$(minikube service --url --format "{{.IP}}:{{.Port}}" --namespace=kube-system tiller-external)
+  - minikube service --url --format "{{.IP}}:{{.Port}}" --namespace=kube-system tiller-external | head -n1
+  - export HELM_HOST=$(minikube service --url --format "{{.IP}}:{{.Port}}" --namespace=kube-system tiller-external | head -n1)
+  - export TILLER_HOST=$(minikube service --url --format "{{.IP}}:{{.Port}}" --namespace=kube-system tiller-external | head -n1)
   - make bootstrap build helmrel cov
 
 after_script:
