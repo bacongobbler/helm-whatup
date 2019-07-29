@@ -132,7 +132,6 @@ func TestCharts(t *testing.T) {
 		"yml",
 		"yaml",
 	}
-
 	formatOutputReturn = false
 	for _, format := range outputFormats {
 		outputFormat = format
