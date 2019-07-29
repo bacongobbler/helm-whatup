@@ -14,7 +14,7 @@ unset HELM_HOST
 runCov
 
 ## reset Helm and Enable TLS
-helm reset || (echo "Could not Reset Helm & Tiller" && exit 1)
+helm reset --force || (echo "Could not Reset Helm & Tiller" && exit 1)
 
 (
     openssl genrsa -out ./ca.key.pem 4096
