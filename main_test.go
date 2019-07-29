@@ -140,7 +140,6 @@ func TestCharts(t *testing.T) {
 	}
 
 	// compare JSON Strings
-	// TODO: Compare Objects
 	outputEqual, err := equalJSON(string(expectedResults), string(newJSON))
 	if err != nil {
 		t.Errorf("[FATAL] Internal Error while comparing Output and expectation: %s", err.Error())
