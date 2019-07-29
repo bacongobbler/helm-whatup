@@ -21,10 +21,12 @@ func TestClient(t *testing.T) {
 
 	if err != nil {
 		t.Errorf("Excpected to get *helm.Client but got intead an Error: %s", err.Error())
+		return
 	}
 
-	if client.PingTiller() != nil {
-		t.Errorf("Excpected a successfull Ping but gut an error")
+	if err = client.PingTiller(); err != nil {
+		t.Errorf("Excpected a successfull Ping but gut an error: %s", err.Error())
+		return
 	}
 }
 
