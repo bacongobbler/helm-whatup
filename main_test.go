@@ -122,12 +122,11 @@ func TestCharts(t *testing.T) {
 	}
 
 	outputFormat = "json"
-	output := []byte(captureOutput(func() {
-		err = formatOutput(result)
-		if err != nil {
-			t.Errorf("Excpected to get nothing but got an Error instead: %s", err.Error())
-		}
-	}))
+	formatOutputReturn = true
+	output, err := formatOutput(result)
+	if err != nil {
+		t.Errorf("Excpected to get nothing but got an Error instead: %s", err.Error())
+	}
 
 	// remove [].{}.latestVersion
 	newJSON := output
