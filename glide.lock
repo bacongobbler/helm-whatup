@@ -1,5 +1,5 @@
-hash: b5a89be06b1109f9346352d72a74a4fc8f280eaaac24d4d208cc666508633e17
-updated: 2019-07-29T18:39:42.005674581+02:00
+hash: 9edd17a38080624c2a053947f705ed5411499cd94021268175660f3920f79f6b
+updated: 2019-07-29T19:04:26.147752985+02:00
 imports:
 - name: github.com/asaskevich/govalidator
   version: 7664702784775e51966f0885f5cd27435916517b
@@ -250,7 +250,7 @@ imports:
   - jws
   - jwt
 - name: golang.org/x/sys
-  version: 95c6576299259db960f6c5b9b69ea52422860fce
+  version: d8e400bc7db4870d786864138af681469693d18c
   subpackages:
   - unix
   - windows
