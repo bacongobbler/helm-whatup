@@ -6,8 +6,8 @@ go:
 install: true
 
 before_script:
-  - export HELM_HOST=127.0.0.1:44134
-  - export TILLER_HOST=127.0.0.1:44134
+  - export HELM_HOST=localhost:8080
+  - export TILLER_HOST=localhost:8080
   - export HELM_HOME=${HOME}/.helm
   - export HELM_PATH_REPOSITORY_FILE=${HELM_HOME}/repository/repositories.yaml
   - curl -L https://git.io/get_helm.sh | bash
@@ -20,6 +20,7 @@ before_script:
   - ./cc-test-reporter before-build
 
 script:
+  - export HELM_TILLER_PORT=8080
   - helm tiller start-ci
   - make bootstrap build helmrel cov
 
