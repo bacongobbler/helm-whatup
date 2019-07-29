@@ -6,14 +6,12 @@ go:
 install: true
 
 before_script:
-  - export HELM_HOST=127.0.0.1:8080
-  - export TILLER_HOST=127.0.0.1:8080
+  - export HELM_HOST=127.0.0.1:44134
+  - export TILLER_HOST=127.0.0.1:44134
   - export HELM_HOME=${HOME}/.helm
   - export HELM_PATH_REPOSITORY_FILE=${HELM_HOME}/repository/repositories.yaml
-  - export HELM_TILLER_PORT=8080
-  - export HELM_TILLER_PROBE_PORT=8081
   - curl -L https://git.io/get_helm.sh | bash
-  - helm init --client-only
+  - helm init
   - helm plugin install https://github.com/rimusz/helm-tiller
   - helm tiller start-ci
   - helm repo add stable https://kubernetes-charts.storage.googleapis.com
@@ -24,7 +22,6 @@ before_script:
   - ./cc-test-reporter before-build
 
 script:
-  - ls -la $HELM_HOME
   - make bootstrap build helmrel cov
 
 after_script:
