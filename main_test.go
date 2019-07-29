@@ -3,13 +3,10 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/tidwall/gjson"
 	"github.com/tidwall/sjson"
-	"log"
-	"os"
 	"reflect"
 	"strconv"
 	"testing"
