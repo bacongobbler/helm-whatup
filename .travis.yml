@@ -24,8 +24,6 @@ before_script:
   - ./cc-test-reporter before-build
 
 script:
-  - echo $HELM_HOST
-  - env
   - make bootstrap build helmrel cov
 
 after_script:
