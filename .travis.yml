@@ -21,8 +21,10 @@ before_script:
 
 script:
   - export HELM_TILLER_PORT=8080
+  - export CREATE_NAMESPACE_IF_MISSING=true
+  - export HELM_TILLER_SILENT=false
   - helm tiller start-ci
-  - make bootstrap build helmrel cov
+  - make bootstrap build helmrel cov || cat ${HOME}/.helm/plugins/helm-tiller/logs/* && exit 1
 
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
