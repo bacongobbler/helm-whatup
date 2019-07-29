@@ -167,7 +167,7 @@ func newClient() (*helm.Client, error) {
 func formatOutput(result []ChartVersionInfo) ([]byte, error) {
 	switch outputFormat {
 	case "table":
-		debug("formatOuput: outputFormat: 'table'")
+		debug("formatOutput: outputFormat: 'table'")
 
 		_table := table.NewWriter()
 		_table.SetOutputMirror(os.Stdout)
