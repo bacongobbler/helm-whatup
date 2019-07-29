@@ -12,7 +12,8 @@ env:
 cache:
   directories:
     - $HOME/.glide
-    - $HOME/.minikube/cache/
+    - $HOME/.minikube/cache
+    - $HOME/.helm/cache
 
 go:
   - 1.12.x
