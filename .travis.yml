@@ -64,4 +64,3 @@ script:
 after_script:
   - cat ${HOME}/.helm/plugins/helm-tiller/logs/*
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
-  - helm tiller stop
