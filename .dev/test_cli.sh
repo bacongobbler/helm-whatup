@@ -36,7 +36,8 @@ helm reset --force || (echo "Could not Reset Helm & Tiller" && exit 1)
 helm init --tiller-tls \
     --tiller-tls-cert ./tiller.cert.pem \
     --tiller-tls-key ./tiller.key.pem \
-    --tls-ca-cert ca.cert.pem
+    --tls-ca-cert ca.cert.pem \
+    --tiller-tls-verify
 
 cp ca.cert.pem $(helm home)/ca.pem
 cp helm.cert.pem $(helm home)/cert.pem
