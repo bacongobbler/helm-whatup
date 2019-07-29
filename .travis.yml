@@ -25,6 +25,7 @@ before_script:
 
 script:
   - helm repo list
+  - helm list --debug
   - make bootstrap build helmrel cov
 
 after_script:
