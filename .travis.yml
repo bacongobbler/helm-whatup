@@ -11,6 +11,7 @@ env:
 
 cache:
   directories:
+    - $HOME/.cache/go-build
     - $HOME/.glide
     - $HOME/.minikube/cache
     - $HOME/.helm/cache
