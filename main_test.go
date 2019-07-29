@@ -175,6 +175,7 @@ func TestMain(t *testing.T) {
 
 /// >>>>> Needed Functions <<<<<
 
+
 // Source: https://gist.github.com/turtlemonvh/e4f7404e28387fadb8ad275a99596f67#file-equal_json-go-L11
 func equalJSON(s1, s2 string) (bool, error) {
 	var o1 interface{}
@@ -193,14 +194,4 @@ func equalJSON(s1, s2 string) (bool, error) {
 	}
 
 	return reflect.DeepEqual(o1, o2), nil
-}
-
-func captureOutput(f func()) string {
-	var buf bytes.Buffer
-	log.SetOutput(&buf)
-
-	f()
-
-	log.SetOutput(os.Stderr)
-	return buf.String()
 }
