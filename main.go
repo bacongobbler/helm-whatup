@@ -281,7 +281,14 @@ func fetchReleases(client *helm.Client) ([]*release.Release, error) {
 func fetchIndices(client *helm.Client) ([]*repo.IndexFile, error) {
 	indices := []*repo.IndexFile{}
 	rfp := os.Getenv("HELM_PATH_REPOSITORY_FILE")
-	repofile, err := repo.LoadRepositoriesFile(rfp)
+	if rfp == "" {
+		rfp = fmt.Sprintf("%s/repository/repositories.yaml", os.ExpandEnv("$HELM_HOME"))
+
+		// check if File exists
+		if _, err := os.Stat(rfp); os.IsNotExist(err) {
+			return nil, fmt.Errorf("helm repository file ($HELM_HOME/repository/repositories.yaml) does not exists. Try to run 'helm repo update'")
+		}
+	}
 
 	repofile, err := repo.LoadRepositoriesFile(rfp)
 	if err != nil {
