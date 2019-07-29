@@ -1,6 +1,9 @@
 bin/
 _dist/
 vendor/
+### Local Development
+*.pem
+
 ### Go template
 # Binaries for programs and plugins
 *.exe
