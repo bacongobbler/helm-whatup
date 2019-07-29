@@ -9,6 +9,10 @@ env:
     - CHANGE_MINIKUBE_NONE_USER=true
     - KUBECONFIG=$HOME/.kube/config
 
+cache:
+  directories:
+    - $HOME/.glide
+    - $HOME/.minikube/cache/
 
 go:
   - 1.12.x
