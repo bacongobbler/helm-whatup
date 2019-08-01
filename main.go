@@ -54,14 +54,16 @@ func main() {
 		RunE:  run,
 	}
 
-	cmd.Flags().StringVarP(&outputFormat, "output", "o", "plain", "output format. Accepted formats: plain, json, yaml, table")
-	cmd.Flags().BoolVarP(&devel, "devel", "d", false, "whether to include pre-releases or not")
-	cmd.Flags().BoolVar(&tlsEnable, "tls", false, "enable TLS for requests to the server")
-	cmd.Flags().StringVar(&tlsCaCert, "tls-ca-cert", os.ExpandEnv(environment.DefaultTLSCaCert), "path to TLS CA certificate file")
-	cmd.Flags().StringVar(&tlsCert, "tls-cert", os.ExpandEnv(environment.DefaultTLSCert), "path to TLS certificate file")
-	cmd.Flags().StringVar(&tlsKey, "tls-key", os.ExpandEnv(environment.DefaultTLSKeyFile), "path to TLS key file")
-	cmd.Flags().StringVar(&tlsHostname, "tls-hostname", "", "the server name used to verify the hostname on the returned certificates from the server")
-	cmd.Flags().BoolVar(&tlsVerify, "tls-verify", false, "enable TLS for requests to the server, and controls whether the client verifies the server's certificate chain and host name")
+	f := cmd.Flags()
+
+	f.StringVarP(&outputFormat, "output", "o", "plain", "output format. Accepted formats: plain, json, yaml, table")
+	f.BoolVarP(&devel, "devel", "d", false, "whether to include pre-releases or not")
+	f.BoolVar(&tlsEnable, "tls", false, "enable TLS for requests to the server")
+	f.StringVar(&tlsCaCert, "tls-ca-cert", os.ExpandEnv(environment.DefaultTLSCaCert), "path to TLS CA certificate file")
+	f.StringVar(&tlsCert, "tls-cert", os.ExpandEnv(environment.DefaultTLSCert), "path to TLS certificate file")
+	f.StringVar(&tlsKey, "tls-key", os.ExpandEnv(environment.DefaultTLSKeyFile), "path to TLS key file")
+	f.StringVar(&tlsHostname, "tls-hostname", "", "the server name used to verify the hostname on the returned certificates from the server")
+	f.BoolVar(&tlsVerify, "tls-verify", false, "enable TLS for requests to the server, and controls whether the client verifies the server's certificate chain and host name")
 
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
