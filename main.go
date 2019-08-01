@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gosuri/uitable"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
@@ -42,7 +43,7 @@ func main() {
 		RunE:  run,
 	}
 
-	cmd.Flags().StringVarP(&outputFormat, "output", "o", "plain", "Output format, choose from plain, json, yaml")
+	cmd.Flags().StringVarP(&outputFormat, "output", "o", "plain", "Output format, choose from plain, json, yaml, table")
 	cmd.Flags().BoolVarP(&devel, "devel", "d", false, "Whether to include pre-releases or not, defaults to false.")
 
 	if err := cmd.Execute(); err != nil {
@@ -134,6 +135,14 @@ func run(cmd *cobra.Command, args []string) error {
 			return err
 		}
 		fmt.Println(string(outputBytes))
+	case "table":
+		table := uitable.New()
+		table.AddRow("RELEASE", "CHART", "INSTALLED_VERSION", "LATEST_VERSION", "STATUS")
+		for _, versionInfo := range result {
+			table.AddRow(versionInfo.ReleaseName, versionInfo.ChartName, versionInfo.InstalledVersion, versionInfo.LatestVersion, versionInfo.Status)
+		}
+		fmt.Println(table)
+
 	default:
 		return fmt.Errorf("invalid formatter: %s", outputFormat)
 	}
