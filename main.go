@@ -10,16 +10,21 @@ import (
 	"gopkg.in/yaml.v2"
 
 	"k8s.io/helm/pkg/helm"
+	"k8s.io/helm/pkg/helm/environment"
 	"k8s.io/helm/pkg/proto/hapi/release"
 	"k8s.io/helm/pkg/repo"
+	"k8s.io/helm/pkg/tlsutil"
 )
 
 const globalUsage = `
 Check to see if there is an updated version available for installed charts.
 `
 
-var outputFormat string
-var devel bool
+var (
+	outputFormat string
+	settings     environment.EnvSettings
+	devel        bool
+)
 
 var version = "canary"
 
@@ -51,8 +56,66 @@ func main() {
 	}
 }
 
+func newClient() (*helm.Client, error) {
+	opts := []helm.Option{}
+
+	helmHost := os.Getenv("TILLER_HOST")
+
+	if helmHost == "" {
+		return nil, fmt.Errorf("TILLER_HOST was not set by Helm")
+	}
+
+	opts = append(opts, helm.Host(helmHost))
+
+	// read in TLS settings from their respective envvars, else read from $HELM_HOME and use the defaults
+	serverName := os.Getenv("HELM_TLS_HOSTNAME")
+	if serverName == "" {
+		serverName = helmHost
+	}
+
+	caCertPath := os.Getenv("HELM_TLS_CA_CERT")
+	if caCertPath == "" {
+		caCertPath = os.ExpandEnv(environment.DefaultTLSCaCert)
+	}
+
+	certPath := os.Getenv("HELM_TLS_CERT")
+	if certPath == "" {
+		certPath = os.ExpandEnv(environment.DefaultTLSCert)
+	}
+
+	keyPath := os.Getenv("HELM_TLS_KEY")
+	if keyPath == "" {
+		keyPath = os.ExpandEnv(environment.DefaultTLSKeyFile)
+	}
+
+	tlsEnable := os.Getenv("HELM_TLS_ENABLE") != ""
+	tlsVerify := os.Getenv("HELM_TLS_VERIFY") != ""
+
+	if tlsEnable || tlsVerify {
+		tlsopts := tlsutil.Options{
+			ServerName:         serverName,
+			CaCertFile:         caCertPath,
+			CertFile:           certPath,
+			KeyFile:            keyPath,
+			InsecureSkipVerify: !tlsVerify,
+		}
+
+		tlscfg, err := tlsutil.ClientConfig(tlsopts)
+		if err != nil {
+			return nil, err
+		}
+
+		opts = append(opts, helm.WithTLS(tlscfg))
+	}
+
+	return helm.NewClient(opts...), nil
+}
+
 func run(cmd *cobra.Command, args []string) error {
-	client := helm.NewClient(helm.Host(os.Getenv("TILLER_HOST")))
+	client, err := newClient()
+	if err != nil {
+		return err
+	}
 
 	releases, err := fetchReleases(client)
 	if err != nil {
