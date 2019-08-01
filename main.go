@@ -24,6 +24,12 @@ var (
 	outputFormat string
 	settings     environment.EnvSettings
 	devel        bool
+	tlsEnable    bool
+	tlsHostname  string
+	tlsCaCert    string
+	tlsCert      string
+	tlsKey       string
+	tlsVerify    bool
 )
 
 var version = "canary"
@@ -48,8 +54,14 @@ func main() {
 		RunE:  run,
 	}
 
-	cmd.Flags().StringVarP(&outputFormat, "output", "o", "plain", "Output format, choose from plain, json, yaml, table")
-	cmd.Flags().BoolVarP(&devel, "devel", "d", false, "Whether to include pre-releases or not, defaults to false.")
+	cmd.Flags().StringVarP(&outputFormat, "output", "o", "plain", "output format. Accepted formats: plain, json, yaml, table")
+	cmd.Flags().BoolVarP(&devel, "devel", "d", false, "whether to include pre-releases or not")
+	cmd.Flags().BoolVar(&tlsEnable, "tls", false, "enable TLS for requests to the server")
+	cmd.Flags().StringVar(&tlsCaCert, "tls-ca-cert", os.ExpandEnv(environment.DefaultTLSCaCert), "path to TLS CA certificate file")
+	cmd.Flags().StringVar(&tlsCert, "tls-cert", os.ExpandEnv(environment.DefaultTLSCert), "path to TLS certificate file")
+	cmd.Flags().StringVar(&tlsKey, "tls-key", os.ExpandEnv(environment.DefaultTLSKeyFile), "path to TLS key file")
+	cmd.Flags().StringVar(&tlsHostname, "tls-hostname", "", "the server name used to verify the hostname on the returned certificates from the server")
+	cmd.Flags().BoolVar(&tlsVerify, "tls-verify", false, "enable TLS for requests to the server, and controls whether the client verifies the server's certificate chain and host name")
 
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
@@ -67,36 +79,40 @@ func newClient() (*helm.Client, error) {
 
 	opts = append(opts, helm.Host(helmHost))
 
-	// read in TLS settings from their respective envvars, else read from $HELM_HOME and use the defaults
-	serverName := os.Getenv("HELM_TLS_HOSTNAME")
-	if serverName == "" {
-		serverName = helmHost
+	// read in TLS settings from their respective envvars, else read from the flags/default filepaths
+	if tlsHostname == "" {
+		tlsHostname = os.Getenv("HELM_TLS_HOSTNAME")
+		if tlsHostname == "" {
+			tlsHostname = helmHost
+		}
 	}
 
-	caCertPath := os.Getenv("HELM_TLS_CA_CERT")
-	if caCertPath == "" {
-		caCertPath = os.ExpandEnv(environment.DefaultTLSCaCert)
+	if tlsCaCert == "" {
+		tlsCaCert = os.Getenv("HELM_TLS_CA_CERT")
 	}
 
-	certPath := os.Getenv("HELM_TLS_CERT")
-	if certPath == "" {
-		certPath = os.ExpandEnv(environment.DefaultTLSCert)
+	if tlsCert == "" {
+		tlsCert = os.Getenv("HELM_TLS_CERT")
 	}
 
-	keyPath := os.Getenv("HELM_TLS_KEY")
-	if keyPath == "" {
-		keyPath = os.ExpandEnv(environment.DefaultTLSKeyFile)
+	if tlsKey == "" {
+		tlsKey = os.Getenv("HELM_TLS_KEY")
 	}
 
-	tlsEnable := os.Getenv("HELM_TLS_ENABLE") != ""
-	tlsVerify := os.Getenv("HELM_TLS_VERIFY") != ""
+	if !tlsEnable {
+		tlsEnable = os.Getenv("HELM_TLS_ENABLE") != ""
+	}
+
+	if !tlsVerify {
+		tlsVerify = os.Getenv("HELM_TLS_VERIFY") != ""
+	}
 
 	if tlsEnable || tlsVerify {
 		tlsopts := tlsutil.Options{
-			ServerName:         serverName,
-			CaCertFile:         caCertPath,
-			CertFile:           certPath,
-			KeyFile:            keyPath,
+			ServerName:         tlsHostname,
+			CaCertFile:         tlsCaCert,
+			CertFile:           tlsCert,
+			KeyFile:            tlsKey,
 			InsecureSkipVerify: !tlsVerify,
 		}
 
