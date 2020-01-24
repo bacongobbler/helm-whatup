@@ -56,7 +56,7 @@ func main() {
 
 	f := cmd.Flags()
 
-	f.StringVarP(&outputFormat, "output", "o", "plain", "output format. Accepted formats: plain, json, yaml, table")
+	f.StringVarP(&outputFormat, "output", "o", "plain", "output format. Accepted formats: plain, json, yaml, table, short")
 	f.BoolVarP(&devel, "devel", "d", false, "whether to include pre-releases or not")
 	f.BoolVar(&tlsEnable, "tls", false, "enable TLS for requests to the server")
 	f.StringVar(&tlsCaCert, "tls-ca-cert", "", "path to TLS CA certificate file")
@@ -216,6 +216,12 @@ func run(cmd *cobra.Command, args []string) error {
 			}
 		}
 		fmt.Println("Done.")
+	case "short":
+		for _, versionInfo := range result {
+			if versionInfo.LatestVersion != versionInfo.InstalledVersion {
+				fmt.Printf("%s (%s): %s --> %s\n", versionInfo.ReleaseName, versionInfo.ChartName, versionInfo.InstalledVersion, versionInfo.LatestVersion)
+			}
+		}
 	case "json":
 		outputBytes, err := json.MarshalIndent(result, "", "    ")
 		if err != nil {
